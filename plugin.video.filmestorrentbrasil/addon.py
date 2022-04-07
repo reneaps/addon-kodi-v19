@@ -413,11 +413,11 @@ def openConfig():
 
 def openURL(url):
         headers= {
-                    'Upgrade-Insecure-Requests': '1',
-                    'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
+                'Upgrade-Insecure-Requests': '1',
+                'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
         }
-        link = requests.get(url=url, headers=headers).text
-        return link
+        link = requests.get(url=url, headers=headers)
+        return link.text
 
 def postURL(url):
         headers = {'Referer': base,
