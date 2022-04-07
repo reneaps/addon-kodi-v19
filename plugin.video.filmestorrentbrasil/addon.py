@@ -34,8 +34,8 @@ base        = 'https://filmestorrentbrasil.com.br/'
 
 def menuPrincipal():
         addDir('Categorias'                 , base + ''                     ,   10, artfolder + 'categorias.png')
-        addDir('Lançamentos'                , base + 'filmes/'              ,   20, artfolder + 'new.png')
-        addDir('Seriados'                   , base + 'series/'              ,   25, artfolder + 'series.png')
+        addDir('Lançamentos'                , base + 'filmes1/'              ,   20, artfolder + 'new.png')
+        addDir('Seriados'                   , base + 'series1/'              ,   25, artfolder + 'series.png')
         addDir('Pesquisa Series'            , '--'                          ,   30, artfolder + 'pesquisa.png')
         addDir('Pesquisa Filmes'            , '--'                          ,   35, artfolder + 'pesquisa.png')
         addDir('Configurações'              , base                          ,  999, artfolder + 'config.png', 1, False)
