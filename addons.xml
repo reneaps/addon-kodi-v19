@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addons>
+<addon id="plugin.video.filmesmp4" name="FilmesMP4" version="1.0.1" provider-name="AddonReneSilva">
+  <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.urlresolver" version="1.0.0"/>
+        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+        <import addon="script.module.requests" version="2.9.1"/>
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+        <language>en</language>
+        <platform>all</platform>
+        <summary lang="en">FilmesMP4</summary>
+        <description lang="en">
+            No addon FilmesMP4 vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
+            VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
+            Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
+        </description>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/media/fanart.jpg</fanart>
+    </assets>
+  </extension>
+</addon>
+
+<addon id="plugin.video.filmestorrentbrasil" name="FilmesTorrentBrasil" version="1.0.5" provider-name="AddonReneSilva">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+    <import addon="script.module.urlresolver" version="1.0.0"/>
+    <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+    <import addon="script.module.requests" version="2.9.1"/>
+    <!--import addon="inputstream.hls" /-->
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+    <language>en</language>
+    <platform>all</platform>
+    <summary lang="en">FilmesTorrentBrasil</summary>
+    <description lang="en">
+        No addon FilmesTorrentBras vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
+        VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
+        Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
+    </description>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.jpg</fanart>
+    </assets>
+  </extension>
+</addon>
+
+<addon id="plugin.video.midiaflixhd" name="MidiaFlixHD" version="2.0.1" provider-name="AddonReneSilva">
+  <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.urlresolver" version="1.0.0"/>
+        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+        <import addon="script.module.requests" version="2.9.1"/>
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+        <language>en</language>
+        <platform>all</platform>
+        <summary lang="en">MidiaFlixHD</summary>
+        <description lang="en">
+            No addon MidiaFlixHD vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
+            VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
+            Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
+        </description>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.jpg</fanart>
+    </assets>
+  </extension>
+</addon>
+
+<addon id="plugin.video.querofilmeshd" name="QueroFilmesHD" version="1.1.3" provider-name="AddonReneSilva">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+    <import addon="script.module.urlresolver" version="1.0.0"/>
+    <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+    <import addon="script.module.requests" version="2.9.1"/>
+    <import addon="inputstream.hls" />
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+    <language>en</language>
+    <platform>all</platform>
+    <summary lang="en">QueroFIlmes</summary>
+    <description lang="en">
+        No addon QueroFilmesHD vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
+        VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
+        Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
+    </description>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.jpg</fanart>
+    </assets>
+  </extension>
+</addon>
+
+<addon id="plugin.video.superflix" name="SuperFlix" version="1.0.0" provider-name="AddonReneSilva">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+    <import addon="script.module.urlresolver" version="1.0.0"/>
+    <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+    <import addon="script.module.requests" version="2.9.1"/>
+    <import addon="inputstream.hls" />
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+        <language>en</language>
+        <platform>all</platform>
+        <summary lang="en">SuperFlix</summary>
+        <description lang="en">
+            No addon SuperFlix vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
+            VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
+        </description>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.jpg</fanart>
+    </assets>
+  </extension>
+</addon>
+
+<addon id="plugin.video.ultracine" name="Ultracine" version="2.0.0" provider-name="AddonReneSilva">
+  <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.urlresolver" version="1.0.0"/>
+        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+        <import addon="script.module.requests" version="2.9.1"/>
+        <import addon="inputstream.hls" />
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>video</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+        <language>en</language>
+        <platform>all</platform>
+        <summary lang="en">Ultracine</summary>
+        <description lang="en">
+            No addon Ultracine vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
+            VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
+            Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
+        </description>
+        <assets>
+          <icon>resources/icon.png</icon>
+          <fanart>resources/fanart.jpg</fanart>
+        </assets>
+      </extension>
+</addon>
+
+<addon id="repository.addonReneSilva" name="AddonReneSilva Repository" version="19.0.0" provider-name="AddonReneSilva">
+	<extension point="xbmc.addon.repository" name="AddonReneSilva Repository">
+        <dir>
+		    <info compressed="false">https://raw.githubusercontent.com/reneaps/addon-kodi-v19/master/addons.xml</info>
+		    <checksum>https://raw.githubusercontent.com/reneaps/addon-kodi-v19/master/addons.xml.md5</checksum>
+		    <datadir zip="true">https://github.com/reneaps/addon-kodi-v19/raw/master/repo/</datadir>
+        </dir>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<platform>all</platform>
+		<summary>RepositÃ³rio AddonReneSilva</summary>
+		<description>RepositÃ³rio de addons brasileiros AddonReneSilva</description>
+        <license></license>
+        <language></language>
+        <website></website>
+        <news></news>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+	</extension>
+</addon>
+
+<addon id="service.proxy" name="ProxyLavarta" version="0.0.1" provider-name="AddonReneSilva">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.requests" version="2.19.1"/>
+    </requires>
+    <extension point="xbmc.service" library="main.py" start="startup"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">ProxyLavarta</summary>
+        <description  lang="pt_BR">
+            Proxy para rodar os m3u8(PNG)
+        </description>
+        <news></news>
+        <platform>all</platform>
+        <license>GPL-2.0-only</license>
+        <assets>
+            <icon>resources/icon.png</icon>
+            <fanart>resources/fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>
+</addons>
