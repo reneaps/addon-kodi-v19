@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.midiaflixhd" name="MidiaFlixHD" version="2.0.1" provider-name="AddonReneSilva">
+  <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.urlresolver" version="1.0.0"/>
+        <import addon="script.module.beautifulsoup4" version="4.3.2"/>
+        <import addon="script.module.requests" version="2.9.1"/>
+  </requires>
+    
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>video</provides>
+  </extension>
+    
+  <extension point="xbmc.addon.metadata">
+        <language>en</language>
+        <platform>all</platform>
+        <summary lang="en">MidiaFlixHD</summary>
+        <description lang="en">
+            No addon MidiaFlixHD você assiste filmes separados por categorias, lançamentos,filmes HD, etc. 
+            Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
+            Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
+        </description>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.jpg</fanart>
+    </assets> 
+  </extension>
+</addon>
