@@ -28,6 +28,7 @@ addonfolder = selfAddon.getAddonInfo('path')
 artfolder   = addonfolder + '/resources/media/'
 fanart      = addonfolder + '/fanart.png'
 base        = 'https://midiaflix.net/'
+USERAGENT   = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0"
 
 ############################################################################################################
 
@@ -418,7 +419,12 @@ def player(name,url,iconimage):
                         r = requests.get(urlVideo)
                         url2Play = re.findall(r'file: "(.+?)",', r.text)[0]
                         OK = False
-
+                        
+                if 'redecine' in urlVideo:
+                        nowID = urlVideo.split("url=")[1]
+                        url2Play = nowID
+                        OK = False
+                        
                 elif 'embed.mystream.to' in urlVideo:
                         html = openURL(urlVideo)
                         e = re.findall('<meta name="twitter:image" content="(.+?)">', html)[0]
@@ -533,8 +539,20 @@ def player(name,url,iconimage):
                         index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
 
                         if index == -1 : return
-                        i = index
-                        urlVideo = host + '/' + idsT[i] + '.m3u8' + '|' + urllib.parse.quote_plus("User-Agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0")+urllib.parse.quote_plus("&Accept=*/*&Accept-Language=pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3&Accept-Encoding=gzip,deflate,br&Origin=https=//uauplayer.com&DNT=1&Connection=keep-alive&Referer=https=//uauplayer.com/")
+                        headers = {
+                                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0",
+                                    "Accept": "*/*",
+                                    "Accept-Language": "pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3",
+                                    "Accept-Encoding": "gzip, deflate, br",
+                                    "Origin": "https://uauplayer.com",
+                                    "DNT": "1",
+                                    "Connection": "keep-alive",
+                                    "Referer": "https://uauplayer.com/",
+                                    "Sec-Fetch-Dest": "empty",
+                                    "Sec-Fetch-Mode": "cors",
+                                    "Sec-Fetch-Site": "cross-site"
+                        }
+                        urlVideo = host + '/' + idsT[i] + '.m3u8' + '|' + urllib.parse.urlencode(headers)
                         url2Play = urlVideo
                         OK = False
 
@@ -636,6 +654,9 @@ def player(name,url,iconimage):
                 listitem.setMimeType('application/x-mpegURL')
                 listitem.setProperty('inputstream',is_helper.inputstream_addon)
                 listitem.setProperty('inputstream.adaptive.manifest_type', PROTOCOL)
+                listitem.setProperty('inputstream.adaptive.stream_headers', 'User-Agent=' + USERAGENT)
+                listitem.setProperty('inputstream.adaptive.play_timeshift_buffer', 'true')
+                listitem.setProperty('inputstream.adaptive.manifest_update_parameter', 'full')
                 listitem.setProperty('inputstream.adaptive.license_type', DRM)
                 listitem.setProperty('inputstream.adaptive.license_key', LICENSE_URL + '||R{SSM}|')
                 #listitem.setMimeType('application/dash+xml')
