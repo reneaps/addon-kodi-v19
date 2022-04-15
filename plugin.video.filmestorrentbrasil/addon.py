@@ -8,7 +8,8 @@
 # Atualizado (1.0.2) - 30/09/2021
 # Atualizado (1.0.3) - 30/01/2022
 # Atualizado (1.0.4) - 11/03/2022
-# Atualizado (1.0.5) - 07/07/2022
+# Atualizado (1.0.5) - 07/04/2022
+# Atualizado (1.0.6) - 15/04/2022
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -19,7 +20,7 @@ import requests
 from bs4                import BeautifulSoup
 from resources.lib      import jsunpack
 
-version   = '1.0.5'
+version   = '1.0.6'
 addon_id  = 'plugin.video.filmestorrentbrasil'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addon = xbmcaddon.Addon()
@@ -229,6 +230,8 @@ def player(name,url,iconimage):
         mensagemprogresso.create('FilmestorrentBrasil', 'Obtendo Fontes para ' + name + ' Por favor aguarde...')
         mensagemprogresso.update(0)
 
+        titsT = []
+        idsT = []
         sub = None
         
         link = openURL(url)
@@ -236,14 +239,29 @@ def player(name,url,iconimage):
         conteudo = soup('article')
         links = conteudo[0]('p')
 
+        n = 1
+
         for link in links:
             if 'campanha' in str(link) :
                 urlF = link.a['href']
                 print(urlF)
                 idS = urlF.split('id=')[-1]
                 urlVideo = base64.b64decode(idS).decode('utf-8')
+                titS = "Server_" + str(n)
+                n = n + 1
+                titsT.append(titS)
+                idsT.append(urlVideo)
 
-        xbmc.log('[plugin.video.filmestorrentbrasil] L352 - ' + str(urlVideo), xbmc.LOGINFO)
+        if not titsT : return
+
+        index = xbmcgui.Dialog().select('Selecione uma das opcoes :', titsT)
+
+        if index == -1 : return
+
+        i = int(index)
+        urlVideo = idsT[i]
+
+        xbmc.log('[plugin.video.filmestorrentbrasil] L263 - ' + str(urlVideo), xbmc.LOGINFO)
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name + ' Por favor aguarde...')
 
