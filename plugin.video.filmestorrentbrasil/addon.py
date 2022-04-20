@@ -10,17 +10,21 @@
 # Atualizado (1.0.4) - 11/03/2022
 # Atualizado (1.0.5) - 07/04/2022
 # Atualizado (1.0.6) - 15/04/2022
+# Atualizado (1.0.7) - 16/04/2022
+# Atualizado (1.0.8) - 20/04/2022
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
 import json
 import urlresolver
 import requests
+import subprocess
+import platform
 
 from bs4                import BeautifulSoup
 from resources.lib      import jsunpack
 
-version   = '1.0.6'
+version   = '1.0.8'
 addon_id  = 'plugin.video.filmestorrentbrasil'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addon = xbmcaddon.Addon()
@@ -34,9 +38,9 @@ base        = 'https://filmestorrentbrasil.com.br/'
 ############################################################################################################
 
 def menuPrincipal():
-        addDir('Categorias'                 , base + ''                     ,   10, artfolder + 'categorias.png')
-        addDir('Lançamentos'                , base + 'filmes1/'              ,   20, artfolder + 'new.png')
-        addDir('Seriados'                   , base + 'series1/'              ,   25, artfolder + 'series.png')
+        addDir('Categorias'                 , base                          ,   10, artfolder + 'categorias.png')
+        addDir('Lançamentos'                , base + 'filmes1/'             ,   20, artfolder + 'new.png')
+        addDir('Seriados'                   , base + 'series1/'             ,   25, artfolder + 'series.png')
         addDir('Pesquisa Series'            , '--'                          ,   30, artfolder + 'pesquisa.png')
         addDir('Pesquisa Filmes'            , '--'                          ,   35, artfolder + 'pesquisa.png')
         addDir('Configurações'              , base                          ,  999, artfolder + 'config.png', 1, False)
@@ -46,18 +50,20 @@ def menuPrincipal():
 def getCategorias(url):
         link = openURL(url)
         soup = BeautifulSoup(link, 'html.parser')
-        conteudo   = soup("ul",{"class":"sub-menu"})
-        categorias = conteudo[0]("li")
+        conteudo = soup('nav', attrs={'id':'menu'})
+        categorias = conteudo[0]('li')
 
         totC = len(categorias)
 
         for categoria in categorias:
-                titC = categoria.a.text
-                urlC = categoria.a["href"]
-                urlC = 'http:%s' % urlC if urlC.startswith("//") else urlC
-                urlC = base + urlC if urlC.startswith("categoria") else urlC
-                imgC = artfolder + limpa(titC) + '.png'
-                addDir(titC,urlC,20,imgC)
+            if not 'Menu' in str(categoria):
+                if not '//filmestorrentbrasil' in str(categoria):
+                    titC = categoria.a.text
+                    urlC = categoria.a["href"]
+                    urlC = 'http:%s' % urlC if urlC.startswith("//") else urlC
+                    urlC = base + urlC if urlC.startswith("/") else urlC
+                    imgC = artfolder + limpa(titC) + '.png'
+                    addDir(titC,urlC,20,imgC)
 
         setViewMenu()
 
@@ -223,6 +229,8 @@ def doPesquisaFilmes():
         for url2, titulo, img in a:
             addDirF(titulo, url2, 100, img, False, total)
 
+        setViewFilmes()
+        
 def player(name,url,iconimage):
         xbmc.log('[plugin.video.filmestorrentbrasil] L249 - ' + str(url), xbmc.LOGINFO)
         OK = True
@@ -430,12 +438,19 @@ def openConfig():
         xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def openURL(url):
-        headers= {
-                'Upgrade-Insecure-Requests': '1',
-                'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
-        }
-        link = requests.get(url=url, headers=headers)
-        return link.text
+        os = platform.system()
+        user_agent = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0"
+        
+        if os == 'Windows' :
+            result = subprocess.check_output(["curl", "-A", user_agent, url], shell=True)
+            return result
+        else:
+            headers= {
+                    "Upgrade-Insecure-Requests": "1",
+                    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0"
+                     }
+            link = requests.get(url=url, headers=headers).text
+            return link
 
 def postURL(url):
         headers = {'Referer': base,
