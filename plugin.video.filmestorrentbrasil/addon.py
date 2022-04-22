@@ -12,6 +12,7 @@
 # Atualizado (1.0.6) - 15/04/2022
 # Atualizado (1.0.7) - 16/04/2022
 # Atualizado (1.0.8) - 20/04/2022
+# Atualizado (1.0.9) - 22/04/2022
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -441,7 +442,7 @@ def openURL(url):
         os = platform.system()
         user_agent = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0"
         
-        if os == 'Windows' :
+        if os == 'Windows' or os == "Android" :
             result = subprocess.check_output(["curl", "-A", user_agent, url], shell=True)
             return result
         else:
