@@ -13,6 +13,7 @@
 # Atualizado (1.0.7) - 16/04/2022
 # Atualizado (1.0.8) - 20/04/2022
 # Atualizado (1.0.9) - 22/04/2022
+# Atualizado (2.0.0) - 02/05/2022
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -25,7 +26,7 @@ import platform
 from bs4                import BeautifulSoup
 from resources.lib      import jsunpack
 
-version   = '1.0.8'
+version   = '2.0.0'
 addon_id  = 'plugin.video.filmestorrentbrasil'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addon = xbmcaddon.Addon()
@@ -34,14 +35,14 @@ _handle = int(sys.argv[1])
 addonfolder = selfAddon.getAddonInfo('path')
 artfolder   = addonfolder + '/resources/media/'
 fanart      = addonfolder + '/fanart.png'
-base        = 'https://filmestorrentbrasil.com.br/'
+base        = 'https://filmestorrentbrasil.com.br'
 
 ############################################################################################################
 
 def menuPrincipal():
         addDir('Categorias'                 , base                          ,   10, artfolder + 'categorias.png')
-        addDir('Lançamentos'                , base + 'filmes1/'             ,   20, artfolder + 'new.png')
-        addDir('Seriados'                   , base + 'series1/'             ,   25, artfolder + 'series.png')
+        addDir('Lançamentos'                , base + '/filmes1/'             ,   20, artfolder + 'new.png')
+        addDir('Seriados'                   , base + '/series1/'             ,   25, artfolder + 'series.png')
         addDir('Pesquisa Series'            , '--'                          ,   30, artfolder + 'pesquisa.png')
         addDir('Pesquisa Filmes'            , '--'                          ,   35, artfolder + 'pesquisa.png')
         addDir('Configurações'              , base                          ,  999, artfolder + 'config.png', 1, False)
@@ -82,16 +83,17 @@ def getFilmes(name,url,iconimage):
                 imgF = filme.img['src']
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
                 urlF = filme.a['href']
-                urlF = 'https://filmestorrentbrasil.com.br%s' % urlF if urlF.startswith("/") else urlF
+                urlF = base + urlF if urlF.startswith("/") else urlF
                 pltF = titF
                 addDirF(titF, urlF, 100, imgF, False, totF)
 
         try :
-                proxima = re.findall('a class="nextpostslink" rel="next" aria-label="Próxima página" href="(.*?)">.*?</a>', link)[0]
-                proxima = 'https://filmestorrentbrasil.com.br%s' % proxima if proxima.startswith("/") else proxima
+                proxima = re.findall(r'<a aria-label=".*?" class="nextpostslink" href="(.*?)" rel="next">.*?</a>', str(soup))[0]
+                proxima = base + proxima if proxima.startswith("/") else proxima
                 addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
         except :
                 pass
+
 
         setViewFilmes()
 
@@ -109,13 +111,13 @@ def getSeries(url):
                 imgF = filme.img['src']
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
                 urlF = filme.a['href']
-                urlF = 'https://filmestorrentbrasil.com.br%s' % urlF if urlF.startswith("/") else urlF
+                urlF = base + urlF if urlF.startswith("/") else urlF
                 pltF = titF
                 addDirF(titF, urlF, 27, imgF, True, totF)
 
         try :
-                proxima = re.findall('a class="nextpostslink" rel="next" aria-label="Próxima página" href="(.*?)">.*?</a>', link)[0]
-                proxima = 'https://filmestorrentbrasil.com.br%s' % proxima if proxima.startswith("/") else proxima
+                proxima = re.findall(r'<a aria-label=".*?" class="nextpostslink" href="(.*?)" rel="next">.*?</a>', str(soup))[0]
+                proxima = base + proxima if proxima.startswith("/") else proxima
                 addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
         except :
                 pass
@@ -175,11 +177,11 @@ def getEpisodios(name, url,iconimage):
                 u = link.a['href']
                 fxID = u.split('?id=')[-1]
                 urlF = base64.b64decode(fxID).decode('utf-8')
-                urlF = 'https://filmestorrentbrasil.com.br%s' % urlF if urlF.startswith("/") else urlF
+                urlF = base + urlF if urlF.startswith("/") else urlF
                 addDir(titF, urlF, 110, imgF, totF, False)
             elif 'magnet' in str(link):
                 urlF = link.a['href']
-                urlF = 'https://filmestorrentbrasil.com.br%s' % urlF if urlF.startswith("/") else urlF
+                urlF = base + urlF if urlF.startswith("/") else urlF
                 addDir(titF, urlF, 110, imgF, totF, False)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='episodes')
@@ -207,7 +209,7 @@ def pesquisa():
                         titF = filme.img['title'].encode('utf-8')
                         imgF = filme.img['src']
                         urlF = filme.a['href']
-                        urlF = 'https://filmestorrentbrasil.com.br%s' % urlF if urlF.startswith("/") else urlF
+                        urlF = base + urlF if urlF.startswith("/") else urlF
                         temp = [urlF, titF, imgF]
                         hosts.append(temp)
 
@@ -519,8 +521,9 @@ def setViewMenu() :
         xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
 
         opcao = selfAddon.getSetting('menuVisu')
+        opcao = '0'
 
-        if   opcao == '0': xbmc.executebuiltin("Container.SetViewMode(50)")
+        if   opcao == '0': xbmc.executebuiltin("Container.SetViewMode(54)")
         elif opcao == '1': xbmc.executebuiltin("Container.SetViewMode(51)")
         elif opcao == '2': xbmc.executebuiltin("Container.SetViewMode(500)")
 
@@ -528,6 +531,9 @@ def setViewFilmes() :
         xbmcplugin.setContent(int(sys.argv[1]), 'movies')
 
         opcao = selfAddon.getSetting('filmesVisu')
+        opcao = '2'
+        
+        xbmc.log('[plugin.video.filmestorrentbrasil] L533 - ' + str(opcao), xbmc.LOGINFO)
 
         if   opcao == '0': xbmc.executebuiltin("Container.SetViewMode(50)")
         elif opcao == '1': xbmc.executebuiltin("Container.SetViewMode(51)")
