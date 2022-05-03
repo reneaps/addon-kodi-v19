@@ -8,6 +8,7 @@
 # Atualizado (2.0.0) - 22/07/2021
 # Atualizado (2.0.1) - 22/09/2021
 # Atualizado (2.0.2) - 12/04/2022
+# Atualizado (2.0.3) - 02/05/2022
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -20,7 +21,7 @@ from bs4            import BeautifulSoup
 from resources.lib  import jsunpack
 from time           import time
 
-version   = '2.0.2'
+version   = '2.0.3'
 addon_id  = 'plugin.video.midiaflixhd'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 
@@ -225,6 +226,11 @@ def pesquisa():
                     filmes = conteudo[0]('article')
                 except:
                     pass
+                try:
+                    conteudo = soup('div', attrs={'class':'search-page'})
+                    filmes = conteudo[0]('article')
+                except:
+                    pass
                 totF = len(filmes)
                 for filme in filmes:
                         titF = filme.img["alt"]
@@ -262,6 +268,7 @@ def doPesquisaFilmes():
         total = len(a)
         for url2, titulo, img in a:
             addDir(titulo, url2, 100, img, False, total)
+            
         setViewFilmes()
 
 def player(name,url,iconimage):
@@ -539,20 +546,20 @@ def player(name,url,iconimage):
                         index = xbmcgui.Dialog().select('Selecione uma das fontes suportadas :', titsT)
 
                         if index == -1 : return
+                        
                         headers = {
-                                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0",
-                                    "Accept": "*/*",
-                                    "Accept-Language": "pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3",
-                                    "Accept-Encoding": "gzip, deflate, br",
-                                    "Origin": "https://uauplayer.com",
-                                    "DNT": "1",
-                                    "Connection": "keep-alive",
-                                    "Referer": "https://uauplayer.com/",
-                                    "Sec-Fetch-Dest": "empty",
-                                    "Sec-Fetch-Mode": "cors",
-                                    "Sec-Fetch-Site": "cross-site"
-                        }
-                        urlVideo = host + '/' + idsT[i] + '.m3u8' + '|' + urllib.parse.urlencode(headers)
+                                 'accept': '*/*',
+                                 'accept-language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7,so;q=0.6,ca;q=0.5,bg;q=0.4,de;q=0.3,it;q=0.2,fr;q=0.1,es;q=0.1',
+                                 'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="100", "Google Chrome";v="100"',
+                                 'sec-ch-ua-mobile': '?0',
+                                 'sec-ch-ua-platform': '"Windows"',
+                                 'sec-fetch-dest': 'empty',
+                                 'sec-fetch-mode': 'cors',
+                                 'sec-fetch-site': 'cross-site',
+                                 'Referer': 'https://uauplayer.com/',
+                                 'Referrer-Policy': 'strict-origin-when-cross-origin'
+                                 }
+                        urlVideo = host + '/' + idsT[index] + '.m3u8' + '|' + urllib.parse.urlencode(headers)
                         url2Play = urlVideo
                         OK = False
 
@@ -646,7 +653,6 @@ def player(name,url,iconimage):
                 PROTOCOL = 'hls'
                 DRM = 'com.widevine.alpha'
                 LICENSE_URL = 'https://widevine-proxy.appspot.com/proxy'
-                #ip = addon.getSetting("inputstream")
                 listitem = xbmcgui.ListItem(name, path=url2Play)
                 listitem.setArt({"thumb": iconimage, "icon": iconimage})
                 is_helper = inputstreamhelper.Helper(PROTOCOL, drm=DRM)
@@ -658,8 +664,7 @@ def player(name,url,iconimage):
                 listitem.setProperty('inputstream.adaptive.play_timeshift_buffer', 'true')
                 listitem.setProperty('inputstream.adaptive.manifest_update_parameter', 'full')
                 listitem.setProperty('inputstream.adaptive.license_type', DRM)
-                listitem.setProperty('inputstream.adaptive.license_key', LICENSE_URL + '||R{SSM}|')
-                #listitem.setMimeType('application/dash+xml')
+                listitem.setProperty('inputstream.adaptive.license_key', LICENSE_URL + '||B{SSM}|')
                 listitem.setContentLookup(False)
                 #listitem.setInfo('video', { 'genre': genre })
                 playlist.add(url2Play,listitem)
