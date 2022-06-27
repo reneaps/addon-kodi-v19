@@ -3,18 +3,9 @@
 #####################################################################
 # Addon : FilmestorrentBrasil
 # By AddonBrasil - 08/08/2020
-# Atualizado (1.0.0) - 01/08/2021
-# Atualizado (1.0.1) - 21/09/2021
-# Atualizado (1.0.2) - 30/09/2021
-# Atualizado (1.0.3) - 30/01/2022
-# Atualizado (1.0.4) - 11/03/2022
-# Atualizado (1.0.5) - 07/04/2022
-# Atualizado (1.0.6) - 15/04/2022
-# Atualizado (1.0.7) - 16/04/2022
-# Atualizado (1.0.8) - 20/04/2022
-# Atualizado (1.0.9) - 22/04/2022
 # Atualizado (2.0.0) - 02/05/2022
 # Atualizado (2.0.1) - 18/05/2022
+# Atualizado (2.0.2) - 27/07/2022
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
@@ -95,11 +86,11 @@ def getFilmes(name,url,iconimage):
         except :
                 pass
 
-
         setViewFilmes()
 
 def getSeries(url):
         xbmc.log('[plugin.video.filmestorrentbrasil] L102- ' + str(url), xbmc.LOGINFO)
+        xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
         conteudo = soup('div', attrs={'class':'posts'})
@@ -123,7 +114,7 @@ def getSeries(url):
         except :
                 pass
 
-        setViewFilmes()
+        #setViewFilmes()
 
 def getTemporadas(name,url,iconimage):
         xbmc.log('[plugin.video.filmestorrentbrasil] L129 - ' + str(url), xbmc.LOGINFO)
@@ -278,7 +269,8 @@ def player(name,url,iconimage):
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name + ' Por favor aguarde...')
 
         if 'magnet' in urlVideo :
-                #urlVideo = urllib.parse.unquote(urlVideo)
+                urlVideo = urllib.parse.unquote(urlVideo)
+                if "&amp;" in str(urlVideo) : urlVideo = urlVideo.replace("&amp;","&")
                 url2Play = 'plugin://plugin.video.elementum/play?uri=' + urlVideo
                 OK = False
 
@@ -364,7 +356,8 @@ def player_series(name,url,iconimage):
         #mensagemprogresso.update(50, 'Resolvendo fonte para ' + name+ ' Por favor aguarde...')
 
         if 'magnet' in urlVideo :
-                #urlVideo = urllib.parse.unquote(urlVideo)
+                urlVideo = urllib.parse.unquote(urlVideo)
+                if "&amp;" in str(urlVideo) : urlVideo = urlVideo.replace("&amp;","&")
                 url2Play = 'plugin://plugin.video.elementum/play?uri={0}'.format(urlVideo)
                 OK = False
 
@@ -472,6 +465,7 @@ def addDir(name, url, mode, iconimage, total=1, pasta=True):
         ok = True
 
         liz = xbmcgui.ListItem(name)
+        pc = xbmc.getInfoLabel('ListItem.Label')
         liz.setProperty('fanart_image', fanart)
         liz.setInfo(type = "Video", infoLabels = {"title": name})
         liz.setArt({'icon': iconimage, 'thumb': iconimage })
@@ -481,7 +475,7 @@ def addDir(name, url, mode, iconimage, total=1, pasta=True):
         #cursor.execute('SELECT playCount FROM files WHERE idPath = ? AND strFilename = ?',
         #                   (102, u))
         #t0=xbmc.getInfoLabel('ListItem.PlayCount')
-        #xbmc.log('[plugin.video.filmestorrentbrasil] L484 - ' + str(u), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L484 - ' + str(pc), xbmc.LOGINFO)
 
         ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=pasta, totalItems=total)
 
@@ -494,9 +488,11 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
         ok = True
 
         liz = xbmcgui.ListItem(name)
+        pc = xbmc.getInfoLabel('ListItem.Label')
         liz.setProperty('fanart_image', fanart)
-        liz.setInfo(type = "Video", infoLabels = {"title": name })
+        liz.setInfo(type = "Video", infoLabels = {"title": name})
         liz.setArt({ 'fanart': iconimage, 'icon': iconimage, 'thumb': iconimage })
+        xbmc.log('[plugin.video.filmestorrentbrasil] L502 - ' + str(pc), xbmc.LOGINFO)
 
         cmItems = []
 
