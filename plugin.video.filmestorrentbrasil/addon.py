@@ -6,9 +6,10 @@
 # Atualizado (2.0.0) - 02/05/2022
 # Atualizado (2.0.1) - 18/05/2022
 # Atualizado (2.0.2) - 27/07/2022
+# Atualizado (2.0.3) - 26/07/2022
 #####################################################################
 
-import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, time, base64
+import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
 import json
 import urlresolver
 import requests
@@ -269,7 +270,7 @@ def player(name,url,iconimage):
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name + ' Por favor aguarde...')
 
         if 'magnet' in urlVideo :
-                urlVideo = urllib.parse.unquote(urlVideo)
+                #urlVideo = urllib.parse.unquote(urlVideo)
                 if "&amp;" in str(urlVideo) : urlVideo = urlVideo.replace("&amp;","&")
                 url2Play = 'plugin://plugin.video.elementum/play?uri=' + urlVideo
                 OK = False
@@ -356,7 +357,7 @@ def player_series(name,url,iconimage):
         #mensagemprogresso.update(50, 'Resolvendo fonte para ' + name+ ' Por favor aguarde...')
 
         if 'magnet' in urlVideo :
-                urlVideo = urllib.parse.unquote(urlVideo)
+                #urlVideo = urllib.parse.unquote(urlVideo)
                 if "&amp;" in str(urlVideo) : urlVideo = urlVideo.replace("&amp;","&")
                 url2Play = 'plugin://plugin.video.elementum/play?uri={0}'.format(urlVideo)
                 OK = False
@@ -435,11 +436,19 @@ def openConfig():
         xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def openURL(url):
-        os = platform.system()
+        os = ""
         user_agent = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0"
+        
+        if hasattr(sys, 'getandroidapilevel'):
+            os = "Android"
+        else:
+            os = platform.system()
 
-        if os == 'Windows' or os == "Android" :
+        if os == 'Windows' :
             result = subprocess.check_output(["curl", "-A", user_agent, url], shell=True)
+            return result
+        elif os == "Android" :
+            result = subprocess.run(["curl", "-A", user_agent, url], capture_output=True,text=True,encoding='UTF-8').stdout
             return result
         else:
             headers= {
