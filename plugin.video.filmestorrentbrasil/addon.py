@@ -7,6 +7,7 @@
 # Atualizado (2.0.1) - 18/05/2022
 # Atualizado (2.0.2) - 27/07/2022
 # Atualizado (2.0.3) - 26/07/2022
+# Atualizado (2.0.4) - 24/11/2022
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -28,7 +29,7 @@ addonfolder = selfAddon.getAddonInfo('path')
 version     = selfAddon.getAddonInfo('version')
 artfolder   = addonfolder + '/resources/media/'
 fanart      = addonfolder + '/fanart.png'
-base        = 'https://filmestorrentbrasil.com.br'
+base        = 'https://filmestorrentbrasil.com'
 
 ############################################################################################################
 

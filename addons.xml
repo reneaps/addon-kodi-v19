@@ -17,9 +17,9 @@
         <platform>all</platform>
         <summary lang="en">FilmesMP4</summary>
         <description lang="en">
-            No addon FilmesMP4 vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
-            VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
-            Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
+            No addon FilmesMP4 você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
+            Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
+            Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
         </description>
     <assets>
       <icon>resources/icon.png</icon>
@@ -28,7 +28,7 @@
   </extension>
 </addon>
 
-<addon id="plugin.video.filmestorrentbrasil" name="FilmesTorrentBrasil" version="2.0.3" provider-name="AddonReneSilva">
+<addon id="plugin.video.filmestorrentbrasil" name="FilmesTorrentBrasil" version="2.0.4" provider-name="AddonReneSilva">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="script.module.urlresolver" version="1.0.0"/>
@@ -46,9 +46,9 @@
     <platform>all</platform>
     <summary lang="en">FilmesTorrentBrasil</summary>
     <description lang="en">
-        No addon FilmesTorrentBras vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
-        VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
-        Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
+        No addon FilmesTorrentBras você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
+        Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
+        Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
     </description>
     <assets>
       <icon>resources/icon.png</icon>
@@ -74,9 +74,9 @@
         <platform>all</platform>
         <summary lang="en">MidiaFlixHD</summary>
         <description lang="en">
-            No addon MidiaFlixHD vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
-            VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
-            Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
+            No addon MidiaFlixHD você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
+            Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
+            Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
         </description>
     <assets>
       <icon>resources/icon.png</icon>
@@ -103,9 +103,9 @@
     <platform>all</platform>
     <summary lang="en">QueroFIlmes</summary>
     <description lang="en">
-        No addon QueroFilmesHD vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
-        VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
-        Atencao: Este addon necessita do script URLRESOLVER na versÃ£o 2.10.8 ou superior
+        No addon QueroFilmesHD você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
+        Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
+        Atencao: Este addon necessita do script URLRESOLVER na versão 2.10.8 ou superior
     </description>
     <assets>
       <icon>resources/icon.png</icon>
@@ -132,8 +132,8 @@
         <platform>all</platform>
         <summary lang="en">SuperFlix</summary>
         <description lang="en">
-            No addon SuperFlix vocÃª assiste filmes separados por categorias, lanÃ§amentos,filmes HD, etc.
-            VocÃª tambÃ©m pode ver as informaÃ§Ãµes ou assistir ao trailer do filme no submenu do addon (BotÃ£o direito do mouse ou tecla "C").
+            No addon SuperFlix você assiste filmes separados por categorias, lançamentos,filmes HD, etc.
+            Você também pode ver as informações ou assistir ao trailer do filme no submenu do addon (Botão direito do mouse ou tecla "C").
         </description>
     <assets>
       <icon>resources/icon.png</icon>
@@ -152,8 +152,8 @@
 	</extension>
 	<extension point="xbmc.addon.metadata">
 		<platform>all</platform>
-		<summary>RepositÃ³rio AddonReneSilva</summary>
-		<description>RepositÃ³rio de addons brasileiros AddonReneSilva</description>
+		<summary>Repositório AddonReneSilva</summary>
+		<description>Repositório de addons brasileiros AddonReneSilva</description>
         <license></license>
         <language></language>
         <website></website>
