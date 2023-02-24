@@ -8,6 +8,7 @@
 # Atualizado (2.0.2) - 27/07/2022
 # Atualizado (2.0.3) - 26/07/2022
 # Atualizado (2.0.4) - 24/11/2022
+# Atualizado (2.0.5) - 24/02/2023
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -29,7 +30,7 @@ addonfolder = selfAddon.getAddonInfo('path')
 version     = selfAddon.getAddonInfo('version')
 artfolder   = addonfolder + '/resources/media/'
 fanart      = addonfolder + '/fanart.png'
-base        = 'https://filmestorrentbrasil.com'
+base        = 'https://filmestorrentbrasil.net'
 
 ############################################################################################################
 
@@ -67,13 +68,14 @@ def getFilmes(name,url,iconimage):
         xbmc.log('[plugin.video.filmestorrentbrasil] L74 - ' + str(url), xbmc.LOGINFO)
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
-        conteudo = soup('div', attrs={'class':'posts'})
-        filmes = conteudo[0]('div', {'class':'post'})
+        conteudo = soup('div', attrs={'class':'finewp-posts-container'})
+        filmes = conteudo[0]('div', {'class':'finewp-grid-post finewp-3-col'})
 
         totF = len(filmes)
 
         for filme in filmes:
-                titF = filme.img['title'].encode('utf-8')
+                titF = filme.a['title'] #.encode('utf-8')
+                titF = titF.replace('Permanent Link to ','')
                 imgF = filme.img['src']
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
                 urlF = filme.a['href']
@@ -95,13 +97,14 @@ def getSeries(url):
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
-        conteudo = soup('div', attrs={'class':'posts'})
-        filmes = conteudo[0]('div', {'class':'post'})
+        conteudo = soup('div', attrs={'class':'finewp-posts-container'})
+        filmes = conteudo[0]('div', {'class':'finewp-grid-post finewp-3-col'})
 
         totF = len(filmes)
 
         for filme in filmes:
-                titF = filme.img['title'].encode('utf-8')
+                titF = filme.a['title'] #.encode('utf-8')
+                titF = titF.replace('Permanent Link to ','')
                 imgF = filme.img['src']
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
                 urlF = filme.a['href']
@@ -173,6 +176,7 @@ def getEpisodios(name, url, iconimage):
                 fxID = u.split('?id=')[-1]
                 urlF = base64.b64decode(fxID).decode('utf-8')
                 urlF = base + urlF if urlF.startswith("/") else urlF
+                titF = str(titF)
                 addDir(titF, urlF, 110, imgF, totF, False)
             elif 'magnet' in str(link):
                 urlF = link.a['href']
@@ -193,14 +197,20 @@ def pesquisa():
                 temp = []
                 link = openURL(url)
                 soup = BeautifulSoup(link, 'html.parser')
-                conteudo = soup('div', attrs={'class':'posts'})
-                filmes = conteudo[0]('div', {'class':'post'})
+                conteudo = soup('div', attrs={'class':'finewp-posts-container'})
+                filmes = conteudo[0]('div', {'class':'finewp-grid-post finewp-3-col'})
 
                 totF = len(filmes)
 
                 for filme in filmes:
-                        titF = filme.img['title'].encode('utf-8')
-                        imgF = filme.img['src']
+                        titF = filme.a['title'] #.encode('utf-8')
+                        titF = titF.replace('Permanent Link to ','')
+                        #xbmc.log('[plugin.video.filmestorrentbrasil] L203 - ' + str(filme), xbmc.LOGINFO)
+                        try:
+                                imgF = filme.img['src']
+                        except: 
+                                imgF = ""
+                                pass
                         imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
                         urlF = filme.a['href']
                         urlF = base + urlF if urlF.startswith("/") else urlF
