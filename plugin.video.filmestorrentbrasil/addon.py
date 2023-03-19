@@ -9,6 +9,7 @@
 # Atualizado (2.0.3) - 26/07/2022
 # Atualizado (2.0.4) - 24/11/2022
 # Atualizado (2.0.5) - 24/02/2023
+# Atualizado (2.0.6) - 19/03/2023
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -40,7 +41,7 @@ def menuPrincipal():
         addDir('Seriados'                   , base + '/series1/'            ,   25, artfolder + 'series.png')
         addDir('Pesquisa Series'            , '--'                          ,   30, artfolder + 'pesquisa.png')
         addDir('Pesquisa Filmes'            , '--'                          ,   35, artfolder + 'pesquisa.png')
-        addDir('Configurações'              , base                          ,  999, artfolder + 'config.png', 1, False)
+        #addDir('Configurações'              , base                          ,  999, artfolder + 'config.png', 1, False)
 
         setViewMenu()
 
@@ -176,11 +177,16 @@ def getEpisodios(name, url, iconimage):
                 fxID = u.split('?id=')[-1]
                 urlF = base64.b64decode(fxID).decode('utf-8')
                 urlF = base + urlF if urlF.startswith("/") else urlF
-                titF = str(titF)
+                name2 = name.split("emporada")[0]
+                titF = titF.split(":")[0]
+                titF = name2 + " - " + str(titF)
                 addDir(titF, urlF, 110, imgF, totF, False)
             elif 'magnet' in str(link):
                 urlF = link.a['href']
                 urlF = base + urlF if urlF.startswith("/") else urlF
+                name2 = name.split("emporada")[0]
+                titF = titF.split(":")[0]
+                titF = name2 + " - " + str(titF)
                 addDir(titF, urlF, 110, imgF, totF, False)
 
 def pesquisa():
@@ -283,7 +289,7 @@ def player(name,url,iconimage):
         if 'magnet' in urlVideo :
                 #urlVideo = urllib.parse.unquote(urlVideo)
                 if "&amp;" in str(urlVideo) : urlVideo = urlVideo.replace("&amp;","&")
-                url2Play = 'plugin://plugin.video.elementum/play?uri=' + urlVideo
+                url2Play = 'plugin://plugin.video.elementum/play?type=movie&uri=' + urlVideo
                 OK = False
 
         if OK :
@@ -370,7 +376,7 @@ def player_series(name,url,iconimage):
         if 'magnet' in urlVideo :
                 #urlVideo = urllib.parse.unquote(urlVideo)
                 if "&amp;" in str(urlVideo) : urlVideo = urlVideo.replace("&amp;","&")
-                url2Play = 'plugin://plugin.video.elementum/play?uri={0}'.format(urlVideo)
+                url2Play = 'plugin://plugin.video.elementum/play?type=episode&uri={0}'.format(urlVideo)
                 OK = False
 
         xbmc.log('[plugin.video.filmestorrentbrasil] L371 - ' + str(url2Play), xbmc.LOGINFO)
