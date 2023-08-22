@@ -11,11 +11,12 @@
 # Atualizado (2.0.5) - 24/02/2023
 # Atualizado (2.0.6) - 19/03/2023
 # Atualizado (2.0.7) - 16/08/2023
+# Atualizado (2.0.8) - 22/08/2023
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
 import json
-import urlresolver
+#import urlresolver
 import requests
 import subprocess
 import platform
@@ -287,7 +288,7 @@ def player(name,url,iconimage):
                 if "&amp;" in str(urlVideo) : urlVideo = urlVideo.replace("&amp;","&")
                 url2Play = 'plugin://plugin.video.elementum/play?uri=' + urlVideo
                 OK = False
-
+        '''
         if OK :
             try:
                 url2Play = urlresolver.resolve(urlVideo)
@@ -296,7 +297,7 @@ def player(name,url,iconimage):
                 dialog.ok(" Erro:", " Video removido! ")
                 url2Play = []
                 pass
-
+        '''
         xbmc.log('[plugin.video.filmestorrentbrasil] L294 - ' + str(url2Play), xbmc.LOGINFO)
 
         if not url2Play : return
@@ -376,7 +377,7 @@ def player_series(name,url,iconimage):
                 OK = False
 
         xbmc.log('[plugin.video.filmestorrentbrasil] L371 - ' + str(url2Play), xbmc.LOGINFO)
-
+        ''''
         if OK :
             try:
                 url2Play = urlresolver.resolve(urlVideo)
@@ -385,7 +386,7 @@ def player_series(name,url,iconimage):
                 dialog.ok(" Erro:", " Video removido! ")
                 url2Play = []
                 pass
-
+        ''''
         if not url2Play : return
 
         if sub is None:
@@ -489,7 +490,7 @@ def addDir(name, url, mode, iconimage, total=1, pasta=True):
         liz = xbmcgui.ListItem(name)
         pc = xbmc.getInfoLabel('ListItem.Label')
         liz.setProperty('fanart_image', fanart)
-        liz.setProperty('IsPlayable', 'true')
+        #liz.setProperty('IsPlayable', 'true')
         liz.setInfo(type = "Video", infoLabels = {"title": name})
         liz.setArt({'icon': iconimage, 'thumb': iconimage })
 
@@ -505,7 +506,7 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
         liz = xbmcgui.ListItem(name)
         pc = xbmc.getInfoLabel('ListItem.Label')
         liz.setProperty('fanart_image', fanart)
-        liz.setProperty('IsPlayable', 'true')
+        #liz.setProperty('IsPlayable', 'true')
         liz.setInfo(type = "Video", infoLabels = {"title": name})
         liz.setArt({ 'fanart': iconimage, 'icon': iconimage, 'thumb': iconimage })
 
