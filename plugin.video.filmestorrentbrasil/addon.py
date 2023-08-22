@@ -377,7 +377,7 @@ def player_series(name,url,iconimage):
                 OK = False
 
         xbmc.log('[plugin.video.filmestorrentbrasil] L371 - ' + str(url2Play), xbmc.LOGINFO)
-        ''''
+        '''
         if OK :
             try:
                 url2Play = urlresolver.resolve(urlVideo)
@@ -386,7 +386,7 @@ def player_series(name,url,iconimage):
                 dialog.ok(" Erro:", " Video removido! ")
                 url2Play = []
                 pass
-        ''''
+        '''
         if not url2Play : return
 
         if sub is None:
