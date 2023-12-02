@@ -44,7 +44,7 @@ def menuPrincipal():
         addDir('Seriados'                   , base + '/category/series/'            ,   25, artfolder + 'series.png')
         addDir('Pesquisa Series'            , '--'                          ,   30, artfolder + 'pesquisa.png')
         addDir('Pesquisa Filmes'            , '--'                          ,   35, artfolder + 'pesquisa.png')
-        addDir('Configurações'              , base                          ,  999, artfolder + 'config.png', 1, False)
+        #addDir('Configurações'              , base                          ,  999, artfolder + 'config.png', 1, False)
 
         setViewMenu()
 
@@ -75,7 +75,7 @@ def getFilmes(name,url,iconimage):
         conteudo = soup('div',{'class':'elementor-widget-container'})
         filmes =conteudo[4]('a')
 
-        xbmc.log('[plugin.video.filmestorrentbrasil] L77 - ' + str(filmes), xbmc.LOGINFO)
+        #xbmc.log('[plugin.video.filmestorrentbrasil] L77 - ' + str(filmes), xbmc.LOGINFO)
 
         totF = len(filmes)
 
@@ -264,7 +264,7 @@ def player(name,url,iconimage):
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
         conteudo = soup('div', attrs={'class':'elementor-widget-container'})
-        links = conteudo[8]('p')
+        links = conteudo[7]('p')
 
         n = 1
 
@@ -548,10 +548,11 @@ def getInfo(url):
 
 def playTrailer(name, url,iconimage):
         link = openURL(url)
-        #ytID = re.findall('<a id="open-trailer" class="btn iconized trailer" data-trailer="https://www.youtube.com/embed/(.*?)rel=0&amp;controls=1&amp;showinfo=0&autoplay=0"><b>Trailler</b> <i class="icon fa fa-play"></i></a>', link)[0]
-        ytID = '' #SytID.replace('?','')
+        ytID = re.findall('<a href="https:\/\/www.youtube.com\/watch\?v=(.*?)" target="_blank" rel="noopener">',link)[0]
 
-        xbmc.executebuiltin('XBMC.RunPlugin("plugin://script.extendedinfo/?info=youtubevideo&&id=%s")' % ytID)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L554 - ' + str(ytID), xbmc.LOGINFO)
+
+        xbmc.executebuiltin('XBMC.RunPlugin(plugin://plugin.video.youtube/play/?video_id=%s)' % ytID)
 
 def setViewMenu() :
         xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
