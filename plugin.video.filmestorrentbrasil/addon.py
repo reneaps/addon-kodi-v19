@@ -13,6 +13,8 @@
 # Atualizado (2.0.7) - 16/08/2023
 # Atualizado (2.0.8) - 22/08/2023
 # Atualizado (2.0.9) - 04/11/2023
+# Atualizado (2.1.0) - 02/12/2023
+# Atualizado (2.1.1) - 17/12/2023
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -73,18 +75,20 @@ def getFilmes(name,url,iconimage):
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
         conteudo = soup('div',{'class':'elementor-widget-container'})
-        filmes =conteudo[4]('a')
+        filmes =conteudo[4]('article')
 
         #xbmc.log('[plugin.video.filmestorrentbrasil] L77 - ' + str(filmes), xbmc.LOGINFO)
 
         totF = len(filmes)
 
         for filme in filmes:
+            titF = ""
             try:
-                titF = filme.img['alt'].encode('utf-8')
-                imgF = filme.img['data-src']
+                titF = filme.h3.text #.encode('utf-8')
+                titF = str(titF).replace('\n','').replace('Torrent','')
+                imgF = filme.a.img['data-src']
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
-                urlF = filme['href']
+                urlF = filme.a['href']
                 urlF = base + urlF if urlF.startswith("/") else urlF
                 pltF = titF
                 addDirF(titF, urlF, 100, imgF, False, totF)
@@ -107,16 +111,17 @@ def getSeries(url):
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
         conteudo = soup('div',{'class':'elementor-widget-container'})
-        filmes =conteudo[4]('a')
+        filmes =conteudo[4]('article')
 
         totF = len(filmes)
 
         for filme in filmes:
             try:
-                titF = filme.img['alt'].encode('utf-8')
-                imgF = filme.img['data-src']
+                titF = filme.h3.text #.encode('utf-8')
+                titF = str(titF).replace('\n','').replace('Torrent','')
+                imgF = filme.a.img['data-src']
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
-                urlF = filme['href']
+                urlF = filme.a['href']
                 urlF = base + urlF if urlF.startswith("/") else urlF
                 pltF = titF
                 addDirF(titF, urlF, 27, imgF, True, totF)
