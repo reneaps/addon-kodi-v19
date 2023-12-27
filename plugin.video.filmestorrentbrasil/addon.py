@@ -37,7 +37,7 @@ addonfolder = selfAddon.getAddonInfo('path')
 version     = selfAddon.getAddonInfo('version')
 artfolder   = addonfolder + '/resources/media/'
 fanart      = addonfolder + '/fanart.png'
-base        = 'https://nerdfilmes.com.br'
+base        = 'https://nerdtorrent.com.br'
 
 ############################################################################################################
 
@@ -190,7 +190,7 @@ def getEpisodios(name, url, iconimage):
                 if '<strong>' in str(link) : titF = link.strong.text
                 if '<b>' in str(link) : titF = link.text
                 if '<a' in str(link) : titF = link.text
-            elif 'WEB' in str(link):
+            elif 'WEB' in str(link).upper():
                 if '<strong>' in str(link) : titF = link.strong.text
                 if '<b>' in str(link) : titF = link.text
                 if '<a' in str(link) : titF = link.text
@@ -229,7 +229,7 @@ def pesquisa():
 
                 for filme in filmes:
                         try:
-                                titF = filme.h3.text
+                                titF = filme.h3.text  #.encode('utf-8')
                                 titF = str(titF).replace('\n','').replace('\t','').replace('Torrent','')
                                 imgF = filme.a.img['src']
                                 urlF = filme.a['href']
@@ -321,7 +321,7 @@ def player(name,url,iconimage):
                 if "&amp;" in str(urlVideo) : urlVideo = urlVideo.replace("&amp;","&")
                 url2Play = 'plugin://plugin.video.elementum/play?uri=' + urlVideo
                 OK = False
-        '''
+        
         if OK :
             try:
                 url2Play = urlresolver.resolve(urlVideo)
@@ -330,7 +330,7 @@ def player(name,url,iconimage):
                 dialog.ok(" Erro:", " Video removido! ")
                 url2Play = []
                 pass
-        '''
+        
         xbmc.log('[plugin.video.filmestorrentbrasil] L294 - ' + str(url2Play), xbmc.LOGINFO)
 
         if not url2Play : return
@@ -521,12 +521,7 @@ def addDir(name, url, mode, iconimage, total=1, pasta=True):
         ok = True
 
         liz = xbmcgui.ListItem(name)
-        info_tag = liz.getVideoInfoTag()
-        info_tag.setMediaType('video')
-        info_tag.setTitle(name.split("|")[0])
-        #info_tag.setEpisode(str(name.split("|")[1]))
         liz.setProperty('fanart_image', fanart)
-        #liz.setProperty('IsPlayable', 'true')
         liz.setInfo(type = "Video", infoLabels = {"title": name})
         liz.setArt({'icon': iconimage, 'thumb': iconimage })
 
@@ -542,7 +537,6 @@ def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
         liz = xbmcgui.ListItem(name)
         pc = xbmc.getInfoLabel('ListItem.Label')
         liz.setProperty('fanart_image', fanart)
-        #liz.setProperty('IsPlayable', 'true')
         liz.setInfo(type = "Video", infoLabels = {"title": name})
         liz.setArt({ 'fanart': iconimage, 'icon': iconimage, 'thumb': iconimage })
 
@@ -569,7 +563,14 @@ def playTrailer(name, url,iconimage):
 
         xbmc.log('[plugin.video.filmestorrentbrasil] L554 - ' + str(ytID), xbmc.LOGINFO)
 
-        xbmc.executebuiltin('XBMC.RunPlugin(plugin://plugin.video.youtube/play/?video_id=%s)' % ytID)
+        if not ytID :
+            addon = xbmcaddon.Addon()
+            addonname = addon.getAddonInfo('name')
+            line1 = str("Trailer não disponível!")
+            xbmcgui.Dialog().ok(addonname, line1)
+            return
+
+        RunPlugin('plugin://plugin.video.youtube/play/?video_id=%s' % ytID)
 
 def setViewMenu() :
         xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
@@ -587,7 +588,7 @@ def setViewFilmes() :
         opcao = selfAddon.getSetting('filmesVisu')
         opcao = '2'
 
-        xbmc.log('[plugin.video.filmestorrentbrasil] L541 - ' + str(opcao), xbmc.LOGINFO)
+        #xbmc.log('[plugin.video.filmestorrentbrasil] L541 - ' + str(opcao), xbmc.LOGINFO)
 
         if   opcao == '0': xbmc.executebuiltin("Container.SetViewMode(50)")
         elif opcao == '1': xbmc.executebuiltin("Container.SetViewMode(51)")
