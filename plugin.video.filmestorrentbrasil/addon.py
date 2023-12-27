@@ -15,6 +15,7 @@
 # Atualizado (2.0.9) - 04/11/2023
 # Atualizado (2.1.0) - 02/12/2023
 # Atualizado (2.1.1) - 17/12/2023
+# Atualizado (2.1.2) - 27/12/2023
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -85,7 +86,7 @@ def getFilmes(name,url,iconimage):
             titF = ""
             try:
                 titF = filme.h3.text #.encode('utf-8')
-                titF = str(titF).replace('\n','').replace('Torrent','')
+                titF = str(titF).replace('\n','').replace('\t','').replace('Torrent','')
                 imgF = filme.a.img['data-src']
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
                 urlF = filme.a['href']
@@ -118,7 +119,7 @@ def getSeries(url):
         for filme in filmes:
             try:
                 titF = filme.h3.text #.encode('utf-8')
-                titF = str(titF).replace('\n','').replace('Torrent','')
+                titF = str(titF).replace('\n','').replace('\t','').replace('Torrent','')
                 imgF = filme.a.img['data-src']
                 imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
                 urlF = filme.a['href']
@@ -185,7 +186,11 @@ def getEpisodios(name, url, iconimage):
                     titF = link.img['alt']
                 if 'COMPLETA' in str(link):
                     titF = link.a.text
-            elif 'Epis' in str(link):
+            elif 'Epis' in str(link).upper():
+                if '<strong>' in str(link) : titF = link.strong.text
+                if '<b>' in str(link) : titF = link.text
+                if '<a' in str(link) : titF = link.text
+            elif 'WEB' in str(link):
                 if '<strong>' in str(link) : titF = link.strong.text
                 if '<b>' in str(link) : titF = link.text
                 if '<a' in str(link) : titF = link.text
@@ -218,16 +223,20 @@ def pesquisa():
                 link = openURL(url)
                 soup = BeautifulSoup(link, 'html.parser')
                 conteudo = soup('div',{'class':'elementor-widget-container'})
-                filmes =conteudo[4]('a')
+                filmes =conteudo[4]('article')
 
                 totF = len(filmes)
 
                 for filme in filmes:
                         try:
-                                titF = filme.img['alt'].encode('utf-8')
-                                imgF = filme.img['src']
-                                imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
-                                urlF = filme['href']
+                                titF = filme.h3.text
+                                titF = str(titF).replace('\n','').replace('\t','').replace('Torrent','')
+                                imgF = filme.a.img['src']
+                                urlF = filme.a['href']
+                                #titF = filme.img['alt'].encode('utf-8')
+                                #imgF = filme.img['src']
+                                #imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
+                                #urlF = filme['href']
                                 urlF = base + urlF if urlF.startswith("/") else urlF
                                 temp = [urlF, titF, imgF]
                                 hosts.append(temp)
@@ -269,7 +278,10 @@ def player(name,url,iconimage):
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
         conteudo = soup('div', attrs={'class':'elementor-widget-container'})
-        links = conteudo[7]('p')
+        #links = conteudo[8]('p')
+        for i in conteudo:
+                if 'magnet' in str(i):
+                        links = i
 
         n = 1
 
@@ -286,7 +298,7 @@ def player(name,url,iconimage):
             if 'magnet' in str(link):
                 urlF = link.a['href']
                 urlVideo = urlF
-                titS = "Server_" +str(n)
+                titS = link.text #"Server_" +str(n)
                 n = n + 1
                 titsT.append(titS)
                 idsT.append(urlVideo)
