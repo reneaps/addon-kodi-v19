@@ -15,7 +15,8 @@
 # Atualizado (2.0.9) - 04/11/2023
 # Atualizado (2.1.0) - 02/12/2023
 # Atualizado (2.1.1) - 17/12/2023
-# Atualizado (2.1.2) - 27/12/2023
+# Atualizado (2.1.2) - 25/12/2023
+# Atualizado (2.1.3) - 28/12/2023
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
