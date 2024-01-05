@@ -17,6 +17,11 @@
 # Atualizado (2.1.1) - 17/12/2023
 # Atualizado (2.1.2) - 25/12/2023
 # Atualizado (2.1.3) - 28/12/2023
+<<<<<<< HEAD
+=======
+# Atualizado (2.1.4) - 03/01/2024
+# Atualizado (2.1.5) - 04/01/2024
+>>>>>>> f7c0eb0c3397630f05c0689df899ce33ff3a06d6
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -33,6 +38,9 @@ addon_id  = 'plugin.video.filmestorrentbrasil'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addon = xbmcaddon.Addon()
 _handle = int(sys.argv[1])
+full_version_info = xbmc.getInfoLabel('System.BuildVersion')
+baseversion = full_version_info.split(".")
+installed_version = int(baseversion[0])
 
 addonfolder = selfAddon.getAddonInfo('path')
 version     = selfAddon.getAddonInfo('version')
@@ -44,8 +52,8 @@ base        = 'https://nerdtorrent.com.br'
 
 def menuPrincipal():
         addDir('Categorias'                 , base                          ,   10, artfolder + 'categorias.png')
-        addDir('Lançamentos'                , base + '/category/filmes/'            ,   20, artfolder + 'new.png')
-        addDir('Seriados'                   , base + '/category/series/'            ,   25, artfolder + 'series.png')
+        addDir('Lançamentos'                , base + '/category/filmes/'    ,   20, artfolder + 'new.png')
+        addDir('Seriados'                   , base + '/category/series/'    ,   25, artfolder + 'series.png')
         addDir('Pesquisa Series'            , '--'                          ,   30, artfolder + 'pesquisa.png')
         addDir('Pesquisa Filmes'            , '--'                          ,   35, artfolder + 'pesquisa.png')
         #addDir('Configurações'              , base                          ,  999, artfolder + 'config.png', 1, False)
@@ -62,7 +70,7 @@ def getCategorias(url):
 
         for categoria in categorias:
             if not 'Menu' in str(categoria):
-                if not '//filmestorrentbrasil' in str(categoria):
+                if not '//nerdtorrent' in str(categoria):
                     titC = categoria.a.text
                     urlC = categoria.a["href"]
                     urlC = 'http:%s' % urlC if urlC.startswith("//") else urlC
@@ -202,12 +210,12 @@ def getEpisodios(name, url, iconimage):
                 urlF = base64.b64decode(fxID).decode('utf-8')
                 urlF = base + urlF if urlF.startswith("/") else urlF
                 titF = name.split("emporada")[0] + " | " + str(titF)
-                addDir(titF, urlF, 110, imgF, totF, False)
+                addDirF(titF, urlF, 110, imgF, False, totF)
             elif 'magnet' in str(link):
                 urlF = link.a['href']
                 urlF = base + urlF if urlF.startswith("/") else urlF
                 titF = str(link.text) #str(titF) + name.split("emporada")[0] + " | " + str(titF)
-                addDir(titF, urlF, 110, imgF, totF, False)
+                addDirF(name+"|"+titF, urlF, 110, imgF, False, totF)
 
 def pesquisa():
         keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
@@ -320,7 +328,9 @@ def player(name,url,iconimage):
         if 'magnet' in urlVideo :
                 #urlVideo = urllib.parse.unquote(urlVideo)
                 if "&amp;" in str(urlVideo) : urlVideo = urlVideo.replace("&amp;","&")
-                url2Play = 'plugin://plugin.video.elementum/play?uri=' + urlVideo
+                url2Play = 'plugin://plugin.video.elementum/play?doresume=false&uri=' + urlVideo
+                #xbmc.executebuiltin('RunPlugin(%s)' % url2Play)
+                #return
                 OK = False
         
         if OK :
@@ -360,11 +370,17 @@ def player(name,url,iconimage):
                 playlist.add(url2Play,listitem)
         else:
                 listitem = xbmcgui.ListItem(name, path=url2Play)
-                listitem.setArt({"thumb": iconimage, "icon": iconimage})
-                listitem.setArt({"Poster": iconimage})
-                listitem.setProperty('IsPlayable', 'true')
-                listitem.setMimeType('video/mp4')
-                playlist.add(url2Play,listitem)
+                if int(installed_version) > 18:
+                        info_tag = listitem.getVideoInfoTag()
+                        info_tag.setMediaType('video')
+                        info_tag.setTitle(name.split("|")[0])
+                        listitem.setArt({'icon': iconimage, 'thumb': iconimage })
+                        playlist.add(url2Play,listitem)
+                else:
+                        listitem.setProperty('fanart_image', fanart)
+                        listitem.setInfo(type = "Video", infoLabels = {"title": name})
+                        listitem.setArt({'icon': iconimage, 'thumb': iconimage })
+                        playlist.add(url2Play,listitem)
 
         xbmcPlayer = xbmc.Player()
 
@@ -392,7 +408,7 @@ def player(name,url,iconimage):
         return OK
 
 def player_series(name,url,iconimage):
-        xbmc.log('[plugin.video.filmestorrentbrasil] L354 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L395 - ' + str(url), xbmc.LOGINFO)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('FilmestorrentBrasil', 'Obtendo Fontes para ' + name + ' Por favor aguarde...')
@@ -402,7 +418,7 @@ def player_series(name,url,iconimage):
 
         urlVideo = url
 
-        #mensagemprogresso.update(50, 'Resolvendo fonte para ' + name+ ' Por favor aguarde...')
+        mensagemprogresso.update(50, 'Resolvendo fonte para ' + name+ ' Por favor aguarde...')
 
         if 'magnet' in urlVideo :
                 #urlVideo = urllib.parse.unquote(urlVideo)
@@ -410,8 +426,8 @@ def player_series(name,url,iconimage):
                 url2Play = 'plugin://plugin.video.elementum/play?uri={0}'.format(urlVideo)
                 OK = False
 
-        xbmc.log('[plugin.video.filmestorrentbrasil] L371 - ' + str(url2Play), xbmc.LOGINFO)
-        '''
+        xbmc.log('[plugin.video.filmestorrentbrasil] L413 - ' + str(url2Play), xbmc.LOGINFO)
+
         if OK :
             try:
                 url2Play = urlresolver.resolve(urlVideo)
@@ -420,7 +436,7 @@ def player_series(name,url,iconimage):
                 dialog.ok(" Erro:", " Video removido! ")
                 url2Play = []
                 pass
-        '''
+
         if not url2Play : return
 
         if sub is None:
@@ -435,7 +451,7 @@ def player_series(name,url,iconimage):
 
         if "m3u8" in url2Play:
                 #ip = addon.getSetting("inputstream")
-                listitem = xbmcgui.ListItem(name, path=url2Play)
+                listitem = xbmcgui.ListItem((name.split("|")[0]), path=url2Play)
                 listitem.setArt({"thumb": iconimage, "icon": iconimage})
                 listitem.setArt({"Poster": iconimage})
                 listitem.setProperty('IsPlayable', 'true')
@@ -444,12 +460,20 @@ def player_series(name,url,iconimage):
                 listitem.setContentLookup(False)
                 playlist.add(url2Play,listitem)
         else:
-                listitem = xbmcgui.ListItem(name.split("|")[0], path=url2Play)
-                listitem.setArt({"thumb": iconimage, "icon": iconimage})
-                listitem.setArt({"Poster": iconimage})
-                listitem.setProperty('IsPlayable', 'true')
-                listitem.setMimeType('video/mp4')
-                playlist.add(url2Play,listitem)
+                listitem = xbmcgui.ListItem(name, path=url2Play)
+                if int(installed_version) > 18:
+                        info_tag = listitem.getVideoInfoTag()
+                        info_tag.setMediaType('video')
+                        info_tag.setTitle(name) #.split("|")[0])
+                        listitem.setArt({'icon': iconimage, 'thumb': iconimage })
+                        listitem.setProperty('IsPlayable', 'true')
+                        listitem.setContentLookup(False)
+                        playlist.add(url2Play,listitem)
+                else:
+                        listitem.setProperty('fanart_image', fanart)
+                        listitem.setInfo(type = "Video", infoLabels = {"title": name})
+                        listitem.setArt({'icon': iconimage, 'thumb': iconimage })
+                        playlist.add(url2Play,listitem)
 
         xbmcPlayer = xbmc.Player()
 
@@ -522,29 +546,58 @@ def addDir(name, url, mode, iconimage, total=1, pasta=True):
         ok = True
 
         liz = xbmcgui.ListItem(name)
+<<<<<<< HEAD
         liz.setProperty('fanart_image', fanart)
         liz.setInfo(type = "Video", infoLabels = {"title": name})
         liz.setArt({'icon': iconimage, 'thumb': iconimage })
+=======
+
+        if int(installed_version) > 18:
+                info_tag = liz.getVideoInfoTag()
+                info_tag.setMediaType('video')
+                info_tag.setTitle(name) #.split("|")[0])
+                liz.setArt({'icon': iconimage, 'thumb': iconimage })
+                #liz.setProperty('IsPlayable', 'false')
+        else:
+                liz.setProperty('fanart_image', fanart)
+                liz.setInfo(type = "Video", infoLabels = {"title": name})
+                liz.setArt({'icon': iconimage, 'thumb': iconimage })
+>>>>>>> f7c0eb0c3397630f05c0689df899ce33ff3a06d6
 
         ok = xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=u, listitem=liz, isFolder=pasta, totalItems=total)
 
         return ok
 
-def addDirF(name,url,mode,iconimage,pasta=True,total=1) :
+def addDirF(name,url,mode,iconimage,pasta=False,total=1) :
         u  = sys.argv[0]+"?url="+urllib.parse.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.parse.quote_plus(name)+"&iconimage="+urllib.parse.quote_plus(iconimage)
 
         ok = True
 
         liz = xbmcgui.ListItem(name)
+<<<<<<< HEAD
         pc = xbmc.getInfoLabel('ListItem.Label')
         liz.setProperty('fanart_image', fanart)
         liz.setInfo(type = "Video", infoLabels = {"title": name})
         liz.setArt({ 'fanart': iconimage, 'icon': iconimage, 'thumb': iconimage })
+=======
+
+        if int(installed_version) > 18:
+                info_tag = liz.getVideoInfoTag()
+                info_tag.setMediaType('video')
+                info_tag.setTitle(name.split("|")[0])
+                liz.setArt({'icon': iconimage, 'thumb': iconimage })
+                #liz.setProperty('IsPlayable', 'true')
+        else:
+                liz.setProperty('fanart_image', fanart)
+                liz.setInfo(type = "Video", infoLabels = {"title": name})
+                liz.setArt({'icon': iconimage, 'thumb': iconimage })
+>>>>>>> f7c0eb0c3397630f05c0689df899ce33ff3a06d6
 
         cmItems = []
 
-        cmItems.append(('[COLOR gold]Informações do Filme[/COLOR]', 'XBMC.RunPlugin(%s?url=%s&mode=98)'%(sys.argv[0], url)))
-        cmItems.append(('[COLOR red]Assistir Trailer[/COLOR]', 'XBMC.RunPlugin(%s?name=%s&url=%s&iconimage=%s&mode=99)'%(sys.argv[0], urllib.parse.quote(name), url, urllib.parse.quote(iconimage))))
+        cmItems.append(('[COLOR gold]Informações do Filme[/COLOR]', 'RunPlugin(%s?url=%s&mode=98'%(sys.argv[0], url)))
+        cmItems.append(('[COLOR red]Assistir Trailer[/COLOR]', 'RunPlugin(%s?name=%s&url=%s&iconimage=%s&mode=99)' % (sys.argv[0], urllib.parse.quote(name), url, urllib.parse.quote(iconimage))))
+        cmItems.append(('[COLOR red]Assistir[/COLOR]', 'RunPlugin(%s?name=%s&url=%s&iconimage=%s&mode=100)' % (sys.argv[0], urllib.parse.quote(name), url, urllib.parse.quote(iconimage))))
 
         liz.addContextMenuItems(cmItems, replaceItems=False)
 
@@ -556,13 +609,18 @@ def getInfo(url):
         link = openURL(url)
         titO = re.findall('<meta property="og:title" content="(.*?)" />', link)[0]
 
-        xbmc.executebuiltin('XBMC.RunScript(script.extendedinfo,info=extendedinfo, name=%s)' % titO)
+        xbmc.executebuiltin('RunScript(script.extendedinfo,info=extendedinfo, name=%s)' % titO)
 
 def playTrailer(name, url,iconimage):
         link = openURL(url)
-        ytID = re.findall('<a href="https:\/\/www.youtube.com\/watch\?v=(.*?)" target="_blank" rel="noopener">',link)[0]
+        ytID = re.findall('data-litespeed-src="https:\/\/www.youtube.com\/embed\/(.*?).feature=oembed"',link)[0]
+        mensagemprogresso = xbmcgui.DialogProgress()
+        mensagemprogresso.create('FilmestorrentBrasil', 'Obtendo Fontes para ' + name + ' Por favor aguarde...')
+        mensagemprogresso.update(0)
 
-        xbmc.log('[plugin.video.filmestorrentbrasil] L554 - ' + str(ytID), xbmc.LOGINFO)
+        mensagemprogresso.update(100, 'Resolvendo fonte para ' + name+ ' Por favor aguarde...')
+        mensagemprogresso.close()
+        xbmc.log('[plugin.video.filmestorrentbrasil] L602 - ' + str(name), xbmc.LOGINFO)
 
         if not ytID :
             addon = xbmcaddon.Addon()
@@ -571,7 +629,14 @@ def playTrailer(name, url,iconimage):
             xbmcgui.Dialog().ok(addonname, line1)
             return
 
+<<<<<<< HEAD
         RunPlugin('plugin://plugin.video.youtube/play/?video_id=%s' % ytID)
+=======
+        mensagemprogresso.update(100)
+        mensagemprogresso.close()
+
+        xbmc.executebuiltin('RunPlugin(plugin://plugin.video.youtube/play/?video_id=%s)' % ytID)
+>>>>>>> f7c0eb0c3397630f05c0689df899ce33ff3a06d6
 
 def setViewMenu() :
         xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
