@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
-<addon id="plugin.video.filmestorrentbrasil" name="FilmesTorrentBrasil" version="2.1.7" provider-name="AddonReneSilva">
+<addon id="plugin.video.filmestorrentbrasil" name="FilmesTorrentBrasil" version="2.1.8" provider-name="AddonReneSilva">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="script.module.beautifulsoup4" version="4.3.2"/>
