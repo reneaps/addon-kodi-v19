@@ -16,6 +16,7 @@
 # Atualizado (2.2.0) - 26/01/2024
 # Atualizado (2.2.1) - 09/02/2024
 # Atualizado (2.2.2) - 08/04/2024
+# Atualizado (2.2.3) - 11/10/2024
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -223,27 +224,27 @@ def pesquisa():
                 hosts = []
                 temp = []
                 link = openURL(url)
-                soup = BeautifulSoup(link, 'html.parser')
+                soup = BeautifulSoup(link, "html.parser")
                 conteudo = soup('div',{'class':'elementor-widget-container'})
-                filmes =conteudo[3]('article')
+                filmes =conteudo[2]('article')
+
+                #xbmc.log('[plugin.video.filmestorrentbrasil] L77 - ' + str(filmes), xbmc.LOGINFO)
 
                 totF = len(filmes)
 
                 for filme in filmes:
+                        titF = ""
                         try:
-                                titF = filme.h3.text  #.encode('utf-8')
-                                titF = str(titF).replace('\n','').replace('\t','').replace('Torrent','')
-                                imgF = filme.a.img['src']
-                                urlF = filme.a['href']
-                                #titF = filme.img['alt'].encode('utf-8')
-                                #imgF = filme.img['src']
-                                #imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
-                                #urlF = filme['href']
-                                urlF = base + urlF if urlF.startswith("/") else urlF
-                                temp = [urlF, titF, imgF]
-                                hosts.append(temp)
+                            titF = filme.h3.text #.encode('utf-8')
+                            titF = str(titF).replace('\n','').replace('\t','').replace('Torrent','')
+                            imgF = filme.a.img['src']
+                            imgF = 'http:%s' % imgF if imgF.startswith("//") else imgF
+                            urlF = filme.a['href']
+                            urlF = base + urlF if urlF.startswith("/") else urlF
+                            temp = [urlF, titF, imgF]
+                            hosts.append(temp)
                         except:
-                                pass
+                            pass
 
                 return hosts
 
