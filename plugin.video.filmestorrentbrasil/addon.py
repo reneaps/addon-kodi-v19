@@ -511,7 +511,7 @@ def openURL(url):
             result = subprocess.check_output(["curl", "-A", user_agent, "-H", upgrade_requests, url], shell=True)
             return result
         elif os == "Android" :
-            result = subprocess.run(["curl", "-A", user_agent, url], capture_output=True,text=True,encoding='UTF-8').stdout
+            result = subprocess.run(["curl", "-A", user_agent, "-H", upgrade_requests, url], capture_output=True,text=True,encoding='UTF-8').stdout
             return result
         else:
             headers= {
