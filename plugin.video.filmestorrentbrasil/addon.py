@@ -18,6 +18,7 @@
 # Atualizado (2.2.2) - 08/04/2024
 # Atualizado (2.2.3) - 11/10/2024
 # Atualizado (3.0.0) - 08/11/2024 > mudou site
+# Atualizado (3.0.1) - 11/11/2024
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -498,7 +499,8 @@ def openConfig():
 
 def openURL(url):
         os = ""
-        user_agent = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0"
+        user_agent = "User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0"
+        upgrade_requests = "Upgrade-Insecure-Requests: 1"
         
         if hasattr(sys, 'getandroidapilevel'):
             os = "Android"
@@ -506,7 +508,7 @@ def openURL(url):
             os = platform.system()
 
         if os == '2Windows' :
-            result = subprocess.check_output(["curl", "-A", user_agent, url], shell=True)
+            result = subprocess.check_output(["curl", "-A", user_agent, "-H", upgrade_requests, url], shell=True)
             return result
         elif os == "Android" :
             result = subprocess.run(["curl", "-A", user_agent, url], capture_output=True,text=True,encoding='UTF-8').stdout
