@@ -19,6 +19,7 @@
 # Atualizado (2.2.3) - 11/10/2024
 # Atualizado (3.0.0) - 08/11/2024 > mudou site
 # Atualizado (3.0.1) - 11/11/2024
+# Atualizado (3.0.2) - 12/11/2024
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -109,7 +110,7 @@ def getFilmes(name,url,iconimage):
         setViewFilmes()
 
 def getSeries(url):
-        xbmc.log('[plugin.video.filmestorrentbrasil] L102- ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L102 - ' + str(url), xbmc.LOGINFO)
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
@@ -124,6 +125,7 @@ def getSeries(url):
                 titF = filme('a')[1].text
                 imgF = filme('div',{'class':'post-image-sub'})[0].get('data-bk')
                 urlF = base + urlF if urlF.startswith("/") else urlF
+                pltF = titF
                 addDirF(titF, urlF, 27, imgF, True, totF)
 
         try :
@@ -169,30 +171,6 @@ def getEpisodios(name, url, iconimage):
             pass
 
         for link in links:
-            '''
-            #xbmc.log('[plugin.video.filmestorrentbrasil] L162 - ' + str(link), xbmc.LOGINFO)
-            if 'tulo Traduzido:' in str(link):
-                titF = link.br.text
-            elif 'tulo Original:' in str(link):
-                titF = link.br.text
-            elif 'emporada' in str(link):
-                if 'strong' in str(link):
-                    titF = link.strong.text
-                if 'b' in str(link):
-                    titF = link.text
-                if 'img' in str(link):
-                    titF = link.img['alt']
-                if 'COMPLETA' in str(link):
-                    titF = link.a.text
-            elif 'Epis' in str(link).upper():
-                if '<strong>' in str(link) : titF = link.strong.text
-                if '<b>' in str(link) : titF = link.text
-                if '<a' in str(link) : titF = link.text
-            elif 'WEB' in str(link).upper():
-                if '<strong>' in str(link) : titF = link.strong.text
-                if '<b>' in str(link) : titF = link.text
-                if '<a' in str(link) : titF = link.text
-            '''
             if 'campanha' in str(link):
                 #if titF: titF = 'Epis'
                 u = link.a['href']
@@ -204,8 +182,10 @@ def getEpisodios(name, url, iconimage):
             elif 'magnet' in str(link):
                 urlF = link.a['href']
                 urlF = base + urlF if urlF.startswith("/") else urlF
-                titF = str(link.text) #str(titF) + name.split("emporada")[0] + " | " + str(titF)
-                addDirF(name+"|"+titF, urlF, 110, imgF, False, totF)
+                titF = str(link.text)
+                titF = titF.replace('\n','')
+                #addDirF(name+"|"+titF, urlF, 110, imgF, False, totF)
+                addDirF(titF, urlF, 110, imgF, False, totF)
 
 def pesquisa():
         keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
@@ -223,8 +203,6 @@ def pesquisa():
                 soup = BeautifulSoup(link, "html.parser")
                 conteudo = soup('div',{'class':'home post-catalog'})
                 filmes = conteudo[0]('div',{'class':'item'})
-
-                #xbmc.log('[plugin.video.filmestorrentbrasil] L77 - ' + str(filmes), xbmc.LOGINFO)
 
                 totF = len(filmes)
 
@@ -297,7 +275,12 @@ def player(name,url,iconimage):
             if 'magnet' in str(link):
                 urlF = link.a['href']
                 urlVideo = urlF
-                titS = link.text.replace('\n','') #"Server_" +str(n)
+                if '&dn=' in str(urlF) : 
+                    titF = urlF.split('&dn=')[1].split('&tr=')[0]
+                    titF = urllib.parse.unquote(titF)
+                    titS = titF[0:50]
+                else:
+                    titS = link.text.replace('\n','') #"Server_" +str(n)
                 n = n + 1
                 titsT.append(titS)
                 idsT.append(urlVideo)
@@ -508,10 +491,10 @@ def openURL(url):
             os = platform.system()
 
         if os == '2Windows' :
-            result = subprocess.check_output(["curl", "-A", user_agent, "-H", upgrade_requests, url], shell=True)
+            result = subprocess.check_output(["curl", "--compressed", "-H", user_agent, "-H", upgrade_requests, url], shell=True)
             return result
-        elif os == "Android" :
-            result = subprocess.run(["curl", "-A", user_agent, "-H", upgrade_requests, url], capture_output=True,text=True,encoding='UTF-8').stdout
+        elif os == "2Android" :
+            result = subprocess.run(["curl", "-H", user_agent, "-H", upgrade_requests, url], capture_output=True,text=True,encoding='UTF-8').stdout
             return result
         else:
             headers= {
