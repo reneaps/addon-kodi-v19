@@ -20,6 +20,7 @@
 # Atualizado (3.0.0) - 08/11/2024 > mudou site
 # Atualizado (3.0.1) - 11/11/2024
 # Atualizado (3.0.2) - 12/11/2024
+# Atualizado (3.0.3) - 17/11/2024
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -84,8 +85,6 @@ def getFilmes(name,url,iconimage):
         conteudo = soup('div',{'class':'home post-catalog'})
         filmes = conteudo[0]('div',{'class':'item'})
 
-        #xbmc.log('[plugin.video.filmestorrentbrasil] L77 - ' + str(filmes), xbmc.LOGINFO)
-
         totF = len(filmes)
 
         for filme in filmes:
@@ -101,7 +100,11 @@ def getFilmes(name,url,iconimage):
                 pass
 
         try :
-                proxima = re.findall(r'<div class="prev-active"><a href="(.*?)">.*?</a></div>', str(soup))[0]
+                proxima = re.findall(r'<div class="prev-active"><a href="(.*?)">.*?</a></div>', str(soup))
+                if len(proxima) > 1:
+                    proxima = proxima[1]
+                else:
+                    proxima = proxima[0]
                 proxima = base + proxima if proxima.startswith("/") else proxima
                 addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
         except :
@@ -117,7 +120,6 @@ def getSeries(url):
         conteudo = soup('div', {'class':'home post-catalog'})
         filmes = conteudo[0]('div', {'class':'item'})
 
-        xbmc.log('[plugin.video.filmestorrentbrasil] L117 - ' + str(conteudo), xbmc.LOGINFO)
         totF = len(filmes)
 
         for filme in filmes:
@@ -129,7 +131,11 @@ def getSeries(url):
                 addDirF(titF, urlF, 27, imgF, True, totF)
 
         try :
-                proxima = re.findall(r'<div class="prev-active"><a href="(.*?)">.*?</a></div>', str(soup))[0]
+                proxima = re.findall(r'<div class="prev-active"><a href="(.*?)">.*?</a></div>', str(soup))
+                if len(proxima) > 1:
+                    proxima = proxima[1]
+                else:
+                    proxima = proxima[0]
                 proxima = base + proxima if proxima.startswith("/") else proxima
                 addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
         except :
