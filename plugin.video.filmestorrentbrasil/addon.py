@@ -22,6 +22,7 @@
 # Atualizado (3.0.2) - 12/11/2024
 # Atualizado (3.0.3) - 17/11/2024
 # Atualizado (3.0.4) - 18/11/2024
+# Atualizado (3.0.5) - 26/11/2024
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -558,12 +559,12 @@ def addDirF(name,url,mode,iconimage,pasta=False,total=1) :
                 info_tag = liz.getVideoInfoTag()
                 info_tag.setMediaType('video')
                 info_tag.setTitle(name.split("|")[0])
-                liz.setArt({'icon': iconimage, 'thumb': iconimage })
+                liz.setArt({'icon': iconimage, 'thumb': iconimage, 'fanart':iconimage  })
                 #liz.setProperty('IsPlayable', 'true')
         else:
                 liz.setProperty('fanart_image', fanart)
                 liz.setInfo(type = "Video", infoLabels = {"title": name})
-                liz.setArt({'icon': iconimage, 'thumb': iconimage })
+                liz.setArt({ 'icon': iconimage, 'thumb': iconimage})
 
         cmItems = []
 
@@ -585,7 +586,7 @@ def getInfo(url):
 
 def playTrailer(name, url,iconimage):
         link = openURL(url)
-        ytID = re.findall('data-litespeed-src="https:\/\/www.youtube.com\/embed\/(.*?).feature=oembed"',link)[0]
+        ytID = re.findall(r'data-youtube-link=https:\/\/www.youtube.com\/embed\/(.*?)></div>',link)[0]
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('FilmestorrentBrasil', 'Obtendo Fontes para ' + name + ' Por favor aguarde...')
         mensagemprogresso.update(0)
