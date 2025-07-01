@@ -23,6 +23,7 @@
 # Atualizado (3.0.3) - 17/11/2024
 # Atualizado (3.0.4) - 18/11/2024
 # Atualizado (3.0.5) - 26/11/2024
+# Atualizado (3.0.6) - 01/07/2025
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -126,7 +127,7 @@ def getSeries(url):
 
         for filme in filmes:
                 urlF = filme('a')[0]['href']
-                titF = filme('a')[1].text
+                titF = filme('a')[1].text.encode('utf-8')
                 imgF = filme('div',{'class':'post-image-sub'})[0].get('data-bk')
                 urlF = base + urlF if urlF.startswith("/") else urlF
                 pltF = titF
@@ -171,7 +172,7 @@ def getEpisodios(name, url, iconimage):
         link = openURL(url)
         soup = BeautifulSoup(link, 'html.parser')
         links = soup('p')
-        if not 'magnet' in str(links) : links = soup('div',{'class':'buttons-content'})
+        #if not 'magnet' in str(links) : links = soup('div',{'class':'post-buttons'})
         totF = len(links)
         imgF = iconimage
         try:
@@ -187,6 +188,15 @@ def getEpisodios(name, url, iconimage):
                 urlF = base64.b64decode(fxID).decode('utf-8')
                 urlF = base + urlF if urlF.startswith("/") else urlF
                 titF = name.split("emporada")[0] + " | " + str(titF)
+                addDirF(titF, urlF, 110, imgF, False, totF)
+            elif '91A89222EFDC' in str(link):
+                #if titF: titF = 'Epis'
+                u = link.a['href']
+                fxID = u[::-1]
+                urlF = base64.b64decode(fxID).decode('utf-8')
+                urlF = base + urlF if urlF.startswith("/") else urlF
+                titF = urlF.split('&')[1]
+                titF = titF.replace('dn=','')
                 addDirF(titF, urlF, 110, imgF, False, totF)
             elif 'magnet' in str(link):
                 urlF = link.a['href']
@@ -265,11 +275,10 @@ def player(name,url,iconimage):
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
         conteudo = soup("div",{"class":"container"})
-        conteudo[1]("div",{"class":"buttons-content"})
         buttons = conteudo[1]("div",{"class":"buttons-content"})
         links=[]
         for i in buttons:
-                if 'magnet' in str(i):
+                if '91A89222EFDC' in str(i):
                     links.append(i)
 
         n = 1
@@ -279,7 +288,18 @@ def player(name,url,iconimage):
                 urlF = link.a['href']
                 print(urlF)
                 idS = urlF.split('id=')[-1]
-                urlVideo = base64.b64decode(idS).decode('utf-8')
+                urlVideo = base64.b64decode(idS)
+                titS = "Server_" + str(n)
+                n = n + 1
+                titsT.append(titS)
+                idsT.append(urlVideo)
+            elif '91A89222EFDC' in str(link):
+                #if titF: titF = 'Epis'
+                u = link.a['href']
+                fxID = u[::-1]
+                urlVideo = base64.b64decode(fxID)
+                urlVideo = urllib.parse.unquote(urlVideo)
+                xbmc.log('[plugin.video.filmestorrentbrasil] L300 - ' + str(urlVideo[0]), xbmc.LOGINFO)
                 titS = "Server_" + str(n)
                 n = n + 1
                 titsT.append(titS)
@@ -310,10 +330,10 @@ def player(name,url,iconimage):
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name + ' Por favor aguarde...')
 
-        if 'magnet' in urlVideo :
+        if 'magnet' in str(urlVideo) :
                 #urlVideo = urllib.parse.unquote(urlVideo)
                 if "&amp;" in str(urlVideo) : urlVideo = urlVideo.replace("&amp;","&")
-                url2Play = 'plugin://plugin.video.elementum/play?doresume=false&uri=' + urlVideo
+                url2Play = 'plugin://plugin.video.elementum/play?uri={0}'.format(urlVideo)
                 #xbmc.executebuiltin('RunPlugin(%s)' % url2Play)
                 #return
                 OK = False
@@ -558,7 +578,7 @@ def addDirF(name,url,mode,iconimage,pasta=False,total=1) :
         if int(installed_version) > 18:
                 info_tag = liz.getVideoInfoTag()
                 info_tag.setMediaType('video')
-                info_tag.setTitle(name.split("|")[0])
+                if "|" in str(name) : info_tag.setTitle(name.split("|")[0])
                 liz.setArt({'icon': iconimage, 'thumb': iconimage, 'fanart':iconimage  })
                 #liz.setProperty('IsPlayable', 'true')
         else:
