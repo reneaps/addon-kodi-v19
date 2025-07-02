@@ -24,6 +24,7 @@
 # Atualizado (3.0.4) - 18/11/2024
 # Atualizado (3.0.5) - 26/11/2024
 # Atualizado (3.0.6) - 01/07/2025
+# Atualizado (3.0.7) - 02/07/2025
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -83,6 +84,7 @@ def getCategorias(url):
 
 def getFilmes(name,url,iconimage):
         xbmc.log('[plugin.video.filmestorrentbrasil] L83 - ' + str(url), xbmc.LOGINFO)
+        xbmcplugin.setContent(handle=int(sys.argv[1]), content='movies')
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
         conteudo = soup('div',{'class':'home post-catalog'})
@@ -95,6 +97,7 @@ def getFilmes(name,url,iconimage):
             try:
                 urlF = filme('a')[0]['href']
                 titF = filme('a')[1].text
+                xbmc.log('[plugin.video.filmestorrentbrasil] L83 - ' + str(titF), xbmc.LOGINFO)
                 imgF = filme('div',{'class':'post-image-sub'})[0].get('data-bk')
                 urlF = base + urlF if urlF.startswith("/") else urlF
                 pltF = titF
@@ -171,8 +174,13 @@ def getEpisodios(name, url, iconimage):
         xbmcplugin.setContent(_handle, content='episodes')
         link = openURL(url)
         soup = BeautifulSoup(link, 'html.parser')
-        links = soup('p')
-        #if not 'magnet' in str(links) : links = soup('div',{'class':'post-buttons'})
+        conteudo = soup("div", {"class":"container"})
+
+        for i in conteudo:
+                if 'catalog' in str(i):
+                        links = i('a')
+        #links = soup('p')
+        #if 'buttons-content' in str(links) : links = soup('div',{'class':'buttons-content'})
         totF = len(links)
         imgF = iconimage
         try:
@@ -191,12 +199,15 @@ def getEpisodios(name, url, iconimage):
                 addDirF(titF, urlF, 110, imgF, False, totF)
             elif '91A89222EFDC' in str(link):
                 #if titF: titF = 'Epis'
-                u = link.a['href']
+                #u = link.a['href']
+                u = link['href']
                 fxID = u[::-1]
-                urlF = base64.b64decode(fxID).decode('utf-8')
+                urlF = base64.b64decode(fxID) #.decode('utf-8')
+                urlF = urllib.parse.unquote(urlF)
                 urlF = base + urlF if urlF.startswith("/") else urlF
                 titF = urlF.split('&')[1]
                 titF = titF.replace('dn=','')
+                titF = urllib.parse.unquote(titF)
                 addDirF(titF, urlF, 110, imgF, False, totF)
             elif 'magnet' in str(link):
                 urlF = link.a['href']
@@ -533,7 +544,7 @@ def openURL(url):
                     "Upgrade-Insecure-Requests": "1",
                     "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0"
                      }
-            link = requests.get(url=url, headers=headers).text
+            link = requests.get(url=url, headers=headers).content
             return link
 
 def postURL(url):
