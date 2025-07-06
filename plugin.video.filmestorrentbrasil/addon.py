@@ -3,7 +3,6 @@
 #####################################################################
 # Addon : FilmestorrentBrasil
 # By AddonBrasil - 08/08/2020
-# Atualizado (2.1.0) - 02/12/2023
 # Atualizado (2.1.1) - 17/12/2023
 # Atualizado (2.1.2) - 25/12/2023
 # Atualizado (2.1.3) - 28/12/2023
@@ -25,6 +24,7 @@
 # Atualizado (3.0.5) - 26/11/2024
 # Atualizado (3.0.6) - 01/07/2025
 # Atualizado (3.0.7) - 02/07/2025
+# Atualizado (3.0.8) - 02=6/07/2025
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -83,7 +83,7 @@ def getCategorias(url):
         setViewMenu()
 
 def getFilmes(name,url,iconimage):
-        xbmc.log('[plugin.video.filmestorrentbrasil] L83 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L86 - ' + str(url), xbmc.LOGINFO)
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='movies')
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
@@ -97,7 +97,7 @@ def getFilmes(name,url,iconimage):
             try:
                 urlF = filme('a')[0]['href']
                 titF = filme('a')[1].text
-                xbmc.log('[plugin.video.filmestorrentbrasil] L83 - ' + str(titF), xbmc.LOGINFO)
+                #xbmc.log('[plugin.video.filmestorrentbrasil] L100- ' + str(titF), xbmc.LOGINFO)
                 imgF = filme('div',{'class':'post-image-sub'})[0].get('data-bk')
                 urlF = base + urlF if urlF.startswith("/") else urlF
                 pltF = titF
@@ -119,7 +119,7 @@ def getFilmes(name,url,iconimage):
         setViewFilmes()
 
 def getSeries(url):
-        xbmc.log('[plugin.video.filmestorrentbrasil] L117 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L122 - ' + str(url), xbmc.LOGINFO)
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
@@ -150,7 +150,7 @@ def getSeries(url):
         #setViewFilmes()
 
 def getTemporadas(name,url,iconimage):
-        xbmc.log('[plugin.video.filmestorrentbrasil] L148 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L153 - ' + str(url), xbmc.LOGINFO)
         html = openURL(url)
         soup = BeautifulSoup(html, 'html.parser')
         conteudo = soup('div', {'id':'seasons'})
@@ -170,17 +170,20 @@ def getTemporadas(name,url,iconimage):
         xbmcplugin.setContent(_handle, content='seasons')
 
 def getEpisodios(name, url, iconimage):
-        xbmc.log('[plugin.video.filmestorren tbrasil] L168 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorren tbrasil] L173 - ' + str(url), xbmc.LOGINFO)
         xbmcplugin.setContent(_handle, content='episodes')
         link = openURL(url)
         soup = BeautifulSoup(link, 'html.parser')
         conteudo = soup("div", {"class":"container"})
-
+        filmes = conteudo[1]("div", {"class":"post-buttons"})
+        links = filmes[0]('a')
+        ''''
         for i in conteudo:
                 if 'catalog' in str(i):
                         links = i('a')
         #links = soup('p')
         #if 'buttons-content' in str(links) : links = soup('div',{'class':'buttons-content'})
+        '''
         totF = len(links)
         imgF = iconimage
         try:
@@ -210,13 +213,12 @@ def getEpisodios(name, url, iconimage):
                 titF = urllib.parse.unquote(titF)
                 addDirF(titF, urlF, 110, imgF, False, totF)
             elif 'magnet' in str(link):
-                urlF = link.a['href']
+                urlF = link['href']
                 urlF = base + urlF if urlF.startswith("/") else urlF
-                titF = str(link.text)
-                titF = titF.replace('\n','')
-                t = ":"
-                r = titF.find(t)
-                titF = titF[0:r]
+                titF = urlF.split('&')[1]
+                titF = titF.replace('dn=','')
+                titF = urllib.parse.unquote(titF)
+                titF = urllib.parse.unquote(titF)
                 #addDirF(name+"|"+titF, urlF, 110, imgF, False, totF)
                 addDirF(titF, urlF, 110, imgF, False, totF)
 
@@ -229,7 +231,7 @@ def pesquisa():
                 pesquisa = urllib.parse.quote(texto)
                 url      = base + '?s=%s' % str(pesquisa)
 
-                xbmc.log('[plugin.video.filmestorrentbrasil] L210 - ' + str(url), xbmc.LOGINFO)
+                xbmc.log('[plugin.video.filmestorrentbrasil] L234 - ' + str(url), xbmc.LOGINFO)
                 hosts = []
                 temp = []
                 link = openURL(url)
@@ -258,7 +260,7 @@ def doPesquisaSeries():
         if a is None : return
         total = len(a)
         for url2, titulo, img in a:
-            xbmc.log('[plugin.video.filmestorrentbrasil] L239 - ' + str(url2), xbmc.LOGINFO)
+            xbmc.log('[plugin.video.filmestorrentbrasil] L263 - ' + str(url2), xbmc.LOGINFO)
             addDirF(titulo, url2, 27, img, True, total)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
@@ -273,7 +275,7 @@ def doPesquisaFilmes():
         setViewFilmes()
 
 def player(name,url,iconimage):
-        xbmc.log('[plugin.video.filmestorrentbrasil] L254 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L278 - ' + str(url), xbmc.LOGINFO)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('FilmestorrentBrasil', 'Obtendo Fontes para ' + name + ' Por favor aguarde...')
@@ -290,6 +292,8 @@ def player(name,url,iconimage):
         links=[]
         for i in buttons:
                 if '91A89222EFDC' in str(i):
+                    links.append(i)
+                elif 'magnet' in str(i):
                     links.append(i)
 
         n = 1
@@ -310,7 +314,7 @@ def player(name,url,iconimage):
                 fxID = u[::-1]
                 urlVideo = base64.b64decode(fxID)
                 urlVideo = urllib.parse.unquote(urlVideo)
-                xbmc.log('[plugin.video.filmestorrentbrasil] L300 - ' + str(urlVideo[0]), xbmc.LOGINFO)
+                xbmc.log('[plugin.video.filmestorrentbrasil] L317 - ' + str(urlVideo[0]), xbmc.LOGINFO)
                 titS = "Server_" + str(n)
                 n = n + 1
                 titsT.append(titS)
@@ -337,7 +341,7 @@ def player(name,url,iconimage):
         i = int(index)
         urlVideo = idsT[i]
 
-        xbmc.log('[plugin.video.filmestorrentbrasil] L308 - ' + str(urlVideo), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L344 - ' + str(urlVideo), xbmc.LOGINFO)
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name + ' Por favor aguarde...')
 
@@ -358,7 +362,7 @@ def player(name,url,iconimage):
                 url2Play = []
                 pass
 
-        xbmc.log('[plugin.video.filmestorrentbrasil] L329 - ' + str(url2Play), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L365 - ' + str(url2Play), xbmc.LOGINFO)
 
         if not url2Play : return
 
@@ -424,7 +428,7 @@ def player(name,url,iconimage):
         return OK
 
 def player_series(name,url,iconimage):
-        xbmc.log('[plugin.video.filmestorrentbrasil] L395 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L431 - ' + str(url), xbmc.LOGINFO)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('FilmestorrentBrasil', 'Obtendo Fontes para ' + name + ' Por favor aguarde...')
@@ -442,7 +446,7 @@ def player_series(name,url,iconimage):
                 url2Play = 'plugin://plugin.video.elementum/play?uri={0}'.format(urlVideo)
                 OK = False
 
-        xbmc.log('[plugin.video.filmestorrentbrasil] L413 - ' + str(url2Play), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L449 - ' + str(url2Play), xbmc.LOGINFO)
 
         if OK :
             try:
@@ -624,7 +628,7 @@ def playTrailer(name, url,iconimage):
 
         mensagemprogresso.update(100, 'Resolvendo fonte para ' + name+ ' Por favor aguarde...')
         mensagemprogresso.close()
-        xbmc.log('[plugin.video.filmestorrentbrasil] L595 - ' + str(name), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L631 - ' + str(name), xbmc.LOGINFO)
 
         if not ytID :
             addon = xbmcaddon.Addon()
@@ -654,7 +658,7 @@ def setViewFilmes() :
         opcao = selfAddon.getSetting('filmesVisu')
         opcao = '2'
 
-        #xbmc.log('[plugin.video.filmestorrentbrasil] L625 - ' + str(opcao), xbmc.LOGINFO)
+        #xbmc.log('[plugin.video.filmestorrentbrasil] L661 - ' + str(opcao), xbmc.LOGINFO)
 
         if   opcao == '0': xbmc.executebuiltin("Container.SetViewMode(50)")
         elif opcao == '1': xbmc.executebuiltin("Container.SetViewMode(51)")
