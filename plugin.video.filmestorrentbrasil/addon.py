@@ -24,7 +24,8 @@
 # Atualizado (3.0.5) - 26/11/2024
 # Atualizado (3.0.6) - 01/07/2025
 # Atualizado (3.0.7) - 02/07/2025
-# Atualizado (3.0.8) - 02=6/07/2025
+# Atualizado (3.0.8) - 06/07/2025
+# Atualizado (3.0.9) - 18/09/2025
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -49,7 +50,7 @@ addonfolder = selfAddon.getAddonInfo('path')
 version     = selfAddon.getAddonInfo('version')
 artfolder   = addonfolder + '/resources/media/'
 fanart      = addonfolder + '/fanart.png'
-base        = 'https://www.starckfilmes.com.br'
+base        = 'https://www.starckfilmes.fans'
 
 ############################################################################################################
 
