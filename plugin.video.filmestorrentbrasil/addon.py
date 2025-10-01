@@ -26,6 +26,7 @@
 # Atualizado (3.0.7) - 02/07/2025
 # Atualizado (3.0.8) - 06/07/2025
 # Atualizado (3.0.9) - 18/09/2025
+# Atualizado (3.1.0) - 01/10/2025
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -177,7 +178,8 @@ def getEpisodios(name, url, iconimage):
         soup = BeautifulSoup(link, 'html.parser')
         conteudo = soup("div", {"class":"container"})
         filmes = conteudo[1]("div", {"class":"post-buttons"})
-        links = filmes[0]('a')
+        if 'epsodios' in str(filmes) : links = filmes[0]('p')
+        if 'buttons-content' in str(filmes) : links = filmes[0]('a')
         ''''
         for i in conteudo:
                 if 'catalog' in str(i):
@@ -214,7 +216,11 @@ def getEpisodios(name, url, iconimage):
                 titF = urllib.parse.unquote(titF)
                 addDirF(titF, urlF, 110, imgF, False, totF)
             elif 'magnet' in str(link):
-                urlF = link['href']
+                try:
+                        urlF = link.a['href']
+                except:
+                        urlF = link['href']
+                pass
                 urlF = base + urlF if urlF.startswith("/") else urlF
                 titF = urlF.split('&')[1]
                 titF = titF.replace('dn=','')
