@@ -27,6 +27,7 @@
 # Atualizado (3.0.8) - 06/07/2025
 # Atualizado (3.0.9) - 18/09/2025
 # Atualizado (3.1.0) - 01/10/2025
+# Atualizado (3.1.1) - 13/04/2026
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -51,7 +52,7 @@ addonfolder = selfAddon.getAddonInfo('path')
 version     = selfAddon.getAddonInfo('version')
 artfolder   = addonfolder + '/resources/media/'
 fanart      = addonfolder + '/fanart.png'
-base        = 'https://www.starckfilmes.fans'
+base        = 'https://www.starckfilmes-v12.com'
 
 ############################################################################################################
 
@@ -99,7 +100,6 @@ def getFilmes(name,url,iconimage):
             try:
                 urlF = filme('a')[0]['href']
                 titF = filme('a')[1].text
-                #xbmc.log('[plugin.video.filmestorrentbrasil] L100- ' + str(titF), xbmc.LOGINFO)
                 imgF = filme('div',{'class':'post-image-sub'})[0].get('data-bk')
                 urlF = base + urlF if urlF.startswith("/") else urlF
                 pltF = titF
@@ -215,13 +215,14 @@ def getEpisodios(name, url, iconimage):
                 titF = titF.replace('dn=','')
                 titF = urllib.parse.unquote(titF)
                 addDirF(titF, urlF, 110, imgF, False, totF)
-            elif 'magnet' in str(link):
+            elif 'data-u' in str(link):
                 try:
-                        urlF = link.a['href']
+                        urlF = link.a['data-u']
                 except:
-                        urlF = link['href']
+                        urlF = link['data-u']
                 pass
                 urlF = base + urlF if urlF.startswith("/") else urlF
+                urlF = urlF[::3]
                 titF = urlF.split('&')[1]
                 titF = titF.replace('dn=','')
                 titF = urllib.parse.unquote(titF)
@@ -238,7 +239,6 @@ def pesquisa():
                 pesquisa = urllib.parse.quote(texto)
                 url      = base + '?s=%s' % str(pesquisa)
 
-                xbmc.log('[plugin.video.filmestorrentbrasil] L234 - ' + str(url), xbmc.LOGINFO)
                 hosts = []
                 temp = []
                 link = openURL(url)
@@ -267,7 +267,6 @@ def doPesquisaSeries():
         if a is None : return
         total = len(a)
         for url2, titulo, img in a:
-            xbmc.log('[plugin.video.filmestorrentbrasil] L263 - ' + str(url2), xbmc.LOGINFO)
             addDirF(titulo, url2, 27, img, True, total)
 
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
@@ -300,7 +299,7 @@ def player(name,url,iconimage):
         for i in buttons:
                 if '91A89222EFDC' in str(i):
                     links.append(i)
-                elif 'magnet' in str(i):
+                elif 'data-u' in str(i):
                     links.append(i)
 
         n = 1
@@ -321,14 +320,13 @@ def player(name,url,iconimage):
                 fxID = u[::-1]
                 urlVideo = base64.b64decode(fxID)
                 urlVideo = urllib.parse.unquote(urlVideo)
-                xbmc.log('[plugin.video.filmestorrentbrasil] L317 - ' + str(urlVideo[0]), xbmc.LOGINFO)
                 titS = "Server_" + str(n)
                 n = n + 1
                 titsT.append(titS)
                 idsT.append(urlVideo)
-            if 'magnet' in str(link):
-                urlF = link.a['href']
-                urlVideo = urlF
+            if 'data-u' in str(link):
+                urlF = link.a['data-u']
+                urlVideo = urlF[::3]
                 if '&dn=' in str(urlF) :
                     titF = urlF.split('&dn=')[1].split('&tr=')[0]
                     titF = urllib.parse.unquote(titF)
