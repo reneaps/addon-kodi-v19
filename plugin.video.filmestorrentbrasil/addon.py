@@ -29,6 +29,7 @@
 # Atualizado (3.1.0) - 01/10/2025
 # Atualizado (3.1.1) - 13/04/2026
 # Atualizado (3.1.2) - 15/04/2026
+# Atualizado (3.1.3) - 24/04/2026
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -228,12 +229,15 @@ def getEpisodios(name, url, iconimage):
                 pass
                 urlF = base + urlF if urlF.startswith("/") else urlF
                 urlF = urlF[::3]
+                urlF = urllib.parse.unquote(urlF)
                 xbmc.log('[plugin.video.filmestorren tbrasil] L231- ' + str(urlF), xbmc.LOGINFO)
                 if "&" in str(urlF):
                         titF = urlF.split('&')[1]
                 else:
-                        titF = str(urlF)
+                        titF = str(link.strong.text)
                 titF = titF.replace('dn=','')
+                if len(titF) < 5 :
+                        titF = str(link.strong.text)
                 titF = urllib.parse.unquote(titF)
                 titF = urllib.parse.unquote(titF)
                 #addDirF(name+"|"+titF, urlF, 110, imgF, False, totF)
@@ -261,7 +265,7 @@ def pesquisa():
                         titF = ""
                         try:
                             urlF = filme('a')[0]['href']
-                            titF = filme('a')[1].text
+                            titF = filme('a')[0]['title']
                             imgF = filme('div',{'class':'post-image-sub'})[0].get('data-bk')
                             urlF = base + urlF if urlF.startswith("/") else urlF
                             temp = [urlF, titF, imgF]
@@ -464,7 +468,7 @@ def player_series(name,url,iconimage):
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name+ ' Por favor aguarde...')
 
         if 'magnet' in urlVideo :
-                #urlVideo = urllib.parse.unquote(urlVideo)
+                urlVideo = urllib.parse.quote(urlVideo)
                 if "&amp;" in str(urlVideo) : urlVideo = urlVideo.replace("&amp;","&")
                 url2Play = 'plugin://plugin.video.elementum/play?uri={0}'.format(urlVideo)
                 OK = False
@@ -644,7 +648,7 @@ def getInfo(url):
 
 def playTrailer(name, url,iconimage):
         link = openURL(url)
-        ytID = re.findall(r'data-youtube-link=https:\/\/www.youtube.com\/embed\/(.*?)></div>',link)[0]
+        ytID = re.findall(r'data-youtube-link=https:\/\/www.youtube.com\/embed\/(.*?)></div>',str(link))[0]
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('FilmestorrentBrasil', 'Obtendo Fontes para ' + name + ' Por favor aguarde...')
         mensagemprogresso.update(0)
