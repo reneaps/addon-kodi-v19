@@ -3,7 +3,6 @@
 #####################################################################
 # Addon : FilmestorrentBrasil
 # By AddonBrasil - 08/08/2020
-# Atualizado (3.0.0) - 08/11/2024 > mudou site
 # Atualizado (3.0.1) - 11/11/2024
 # Atualizado (3.0.2) - 12/11/2024
 # Atualizado (3.0.3) - 17/11/2024
@@ -18,6 +17,7 @@
 # Atualizado (3.1.2) - 15/04/2026
 # Atualizado (3.1.3) - 24/04/2026
 # Atualizado (3.1.4) - 30/04/2026
+# Atualizado (3.1.5) - 30/04/2026
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -615,7 +615,7 @@ def addDirF(name,url,mode,iconimage,pasta=False,total=1) :
                         info_tag.setTitle(name)
                 #xbmc.log('[plugin.video.filmestorrentbrasil] L616 - ' + str(name), xbmc.LOGINFO)
                 liz.setArt({'icon': iconimage, 'poster': iconimage, 'thumb': iconimage, 'fanart': iconimage })
-                liz.setProperty('IsPlayable', 'true')
+                #liz.setProperty('IsPlayable', 'true')
         else:
                 liz.setProperty('fanart_image', fanart)
                 liz.setInfo(type = "Video", infoLabels = {"title": name})
