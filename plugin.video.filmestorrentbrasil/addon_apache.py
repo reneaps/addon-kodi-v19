@@ -20,7 +20,7 @@
 # Atualizado (3.1.5) - 30/04/2026
 # Atualizado (3.1.6) - 07/05/2026
 # Atualizado (3.1.7) - 09/05/2026
-# Atualizado (3.1.8) - 03/06/2026
+# Atualizado (3.1.8) - 17/05/2026
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -36,6 +36,7 @@ from resources.lib      import jsunpack
 addon_id  = 'plugin.video.filmestorrentbrasil'
 selfAddon = xbmcaddon.Addon(id=addon_id)
 addon = xbmcaddon.Addon()
+URL = sys.argv[0]
 _handle = int(sys.argv[1])
 full_version_info = xbmc.getInfoLabel('System.BuildVersion')
 baseversion = full_version_info.split(".")
@@ -45,71 +46,69 @@ addonfolder = selfAddon.getAddonInfo('path')
 version     = selfAddon.getAddonInfo('version')
 artfolder   = addonfolder + '/resources/media/'
 fanart      = addonfolder + '/fanart.png'
-base        = 'https://www.starckfilmes-v17.com'
+base        = 'https://apachetorrent.com'
 
 ############################################################################################################
 
 def menuPrincipal():
-        addDir('Categorias'                 , base                          ,   10, artfolder + 'categorias.png')
-        addDir('Lançamentos'                , base + '/?year=2026'          ,   20, artfolder + 'new.png')
-        addDir('Filmes'                     , base + '/?type=filme'         ,   20, artfolder + 'filmes.png')
-        addDir('Seriados'                   , base + '/?type=série'         ,   25, artfolder + 'series.png')
-        addDir('Pesquisa Series'            , '--'                          ,   30, artfolder + 'pesquisa.png')
-        addDir('Pesquisa Filmes'            , '--'                          ,   35, artfolder + 'pesquisa.png')
-        #addDir('Configurações'              , base                          ,  999, artfolder + 'config.png', 1, False)
+        addDir('Categorias'                 , base                              ,   10, artfolder + 'categorias.png')
+        addDir('Lançamentos'                , base + '/categoria/lancamentos/'  ,   20, artfolder + 'new.png')
+        addDir('Filmes'                     , base + '/filmes/'                 ,   20, artfolder + 'filmes.png')
+        addDir('Seriados'                   , base + '/series/'                 ,   25, artfolder + 'series.png')
+        addDir('Pesquisa Series'            , '--'                              ,   30, artfolder + 'pesquisa.png')
+        addDir('Pesquisa Filmes'            , '--'                              ,   35, artfolder + 'pesquisa.png')
 
         setViewMenu()
 
 def getCategorias(url):
         link = openURL(url)
         soup = BeautifulSoup(link, 'html.parser')
-        #conteudo = soup('div',{'class':'elementor-widget-container'})
-        conteudo = soup('nav')
-        categorias = conteudo[0]('li')
 
-        totC = len(categorias)
+        totC = len(soup.select('li .nav-link'))
 
-        for categoria in categorias:
-                titC = categoria.a.text
-                urlC = categoria.a["href"]
-                urlC = 'http:%s' % urlC if urlC.startswith("//") else urlC
-                urlC = base + urlC if urlC.startswith("/") else urlC
+        for i,item in enumerate(soup.select('li .nav-link')):
+                titC = item.text
+                urlC = item['href']
                 imgC = artfolder + limpa(titC) + '.png'
                 addDir(titC,urlC,20,imgC)
+
+        # for categoria in categorias:
+        #         titC = categoria.a.text
+        #         urlC = categoria.a["href"]
+        #         urlC = 'http:%s' % urlC if urlC.startswith("//") else urlC
+        #         urlC = base + urlC if urlC.startswith("/") else urlC
+        #         imgC = artfolder + limpa(titC) + '.png'
+        #         addDir(titC,urlC,20,imgC)
 
         setViewMenu()
 
 def getFilmes(name,url,iconimage):
-        xbmc.log('[plugin.video.filmestorrentbrasil] L83 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L82 - ' + str(url), xbmc.LOGINFO)
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='movies')
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
-        conteudo = soup('div',{'class':'home post-catalog'})
-        filmes = conteudo[0]('div',{'class':'item'})
 
-        totF = len(filmes)
+        totF = len(soup.css.select(".capaname > a"))
 
-        for filme in filmes:
-            titF = ""
-            try:
-                urlF = filme('a')[0]['href']
-                titF = filme('a')[1].text
-                imgF = filme('div',{'class':'post-image-sub'})[0].get('data-bk')
-                urlF = base + urlF if urlF.startswith("/") else urlF
+        for i,item in enumerate(soup.css.select(".capaname > a")):
+                titF = ''
+                titF = item['title']
+                titF = titF.replace('Torrent Download Dublado','').replace('/ Dual Áudio','').replace('Legendado Torrent Download','')
+                urlF = item['href']
+                imgF = item.img['src']
                 plot = sinopse(urlF)
+                # xbmc.log('[plugin.video.filmestorrentbrasil] L96 - ' + str(plot), xbmc.LOGINFO)
                 if "Temporada" in titF:
                         addDirF(titF, urlF, 27, imgF, plot, True, totF)
                 else:
                         addDirF(titF, urlF, 100, imgF, plot, False, totF)
-            except:
-                pass
 
         try :
-                proxima = re.findall(r'<div class="prev-active"><a href="(.*?)">.*?</a></div>', str(soup))
-                if len(proxima) > 1:
-                    proxima = proxima[1]
-                else:
-                    proxima = proxima[0]
+                proxima = soup.select_one('a[title^="Avançar"]')['href']
+                # if len(proxima) > 1:
+                #     proxima = proxima[1]
+                # else:
+                #     proxima = proxima[0]
                 proxima = base + proxima if proxima.startswith("/") else proxima
                 addDir('Próxima Página >>', proxima, 20, artfolder + 'proxima.png')
         except :
@@ -118,38 +117,52 @@ def getFilmes(name,url,iconimage):
         setViewFilmes()
 
 def getSeries(url):
-        xbmc.log('[plugin.video.filmestorrentbrasil] L121 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L119 - ' + str(url), xbmc.LOGINFO)
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
-        conteudo = soup('div', {'class':'home post-catalog'})
-        filmes = conteudo[0]('div', {'class':'item'})
 
-        totF = len(filmes)
+        totF = len(soup.css.select(".capaname > a"))
 
-        for filme in filmes:
-                urlF = filme('a')[0]['href']
-                titF = filme('a')[1].text #.encode('utf-8')
-                imgF = filme('div',{'class':'post-image-sub'})[0].get('data-bk')
-                urlF = base + urlF if urlF.startswith("/") else urlF
+        for i,item in enumerate(soup.css.select(".capaname > a")):
+                titF = ''
+                titF = item['title']
+                titF = titF.replace('Torrent Download Dublado','').replace('/ Dual Áudio','').replace('Legendado Torrent Download','')
+                urlF = item['href']
+                imgF = item.img['src']
                 plot = sinopse(urlF)
+                # xbmc.log('[plugin.video.filmestorrentbrasil] L133 - ' + str(plot), xbmc.LOGINFO)
                 addDirF(titF, urlF, 27, imgF, plot, True, totF)
 
+        # conteudo = soup('div', {'class':'home post-catalog'})
+        # filmes = conteudo[0]('div', {'class':'item'})
+        # totF = len(filmes)
+
+        # for filme in filmes:
+        #         urlF = filme('a')[0]['href']
+        #         titF = filme('a')[1].text #.encode('utf-8')
+        #         imgF = filme('div',{'class':'post-image-sub'})[0].get('data-bk')
+        #         urlF = base + urlF if urlF.startswith("/") else urlF
+        #         plot = sinopse(urlF)
+        #         addDirF(titF, urlF, 27, imgF, plot, True, totF)
+
         try :
-                proxima = re.findall(r'<div class="prev-active"><a href="(.*?)">.*?</a></div>', str(soup))
-                if len(proxima) > 1:
-                    proxima = proxima[1]
-                else:
-                    proxima = proxima[0]
+                proxima = soup.select_one('a[title^="Avançar"]')['href']
+                # proxima = re.findall(r'<div class="prev-active"><a href="(.*?)">.*?</a></div>', str(soup))
+                # if len(proxima) > 1:
+                #     proxima = proxima[1]
+                # else:
+                #     proxima = proxima[0]
                 proxima = base + proxima if proxima.startswith("/") else proxima
+                # xbmc.log('[plugin.video.filmestorrentbrasil] L156 - ' + str(proxima), xbmc.LOGINFO)
                 addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
         except :
                 pass
 
-        #setViewFilmes()
+        xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
 
 def getTemporadas(name,url,iconimage):
-        xbmc.log('[plugin.video.filmestorrentbrasil] L152 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L151 - ' + str(url), xbmc.LOGINFO)
         html = openURL(url)
         soup = BeautifulSoup(html, 'html.parser')
         conteudo = soup('div', {'id':'seasons'})
@@ -169,49 +182,75 @@ def getTemporadas(name,url,iconimage):
         xbmcplugin.setContent(_handle, content='seasons')
 
 def getEpisodios(name, url, iconimage):
-        xbmc.log('[plugin.video.filmestorren tbrasil] L172 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorren tbrasil] L184 - ' + str(url), xbmc.LOGINFO)
         xbmcplugin.setContent(_handle, content='episodes')
         link = openURL(url)
         soup = BeautifulSoup(link, 'html.parser')
-        conteudo = soup("div", {"class":"container"})
-        filmes = conteudo[1]("div", {"class":"post-buttons"})
-        if 'epsodios' in str(filmes) : links = filmes[0]('p')
-        if 'buttons-content' in str(filmes) : links = filmes[0]('a')
-
-        totF = len(links)
         imgF = ''
-        titf = ''
+        titF = ''
         urlF = ''
-        imgF = soup.select_one('.capa-img div')['data-bk']
-
+        imgF = soup.select_one('.cover > img:nth-child(1)')['src']
+        temp = []
         try:
-                plot=soup.select('.sinopse > span:nth-child(2)')[0].text
-                year=soup.select('.post-description > p:nth-child(4) > span:nth-child(2)')[0].text
-                genre=soup.select('.post-description > p:nth-child(6) > span:nth-child(2)')[0].text
-                name_ori=soup.select('.post-description > p:nth-child(3) > span:nth-child(2)')[0].text
-                genre=genre.split(',')
-                temp = ({'plot':plot,'year':int(year),'genre':genre,'titleoriginal':name_ori})
+                titF = soup.select_one('p.cover > img')['title']
+                titF = titF.replace('Torrent','').replace('Download','')
+                plot = soup.select('.sinopse')[0].text
+                plot = soup.select('.sinopse')[0].text
+                plot = plot.replace('\n','').replace('\t','')
+                year = soup.select('.infos > p:nth-child(1) > strong:nth-child(7)')[0].next_sibling.split()[1]
+                info = soup.select('.infos > p:nth-child(1)')[0]
+                genre = re.findall(r'<strong>Gêneros</strong>:(.*?)<br> <strong>', str(info))[0]
+                genre = genre.split(',')
+                t = soup.select_one('.embed-responsive-item')['src']
+                trailer = 'plugin://plugin.video.youtube/play/?video_id=%s' % t.split('/')[4]
+                name_ori = soup.select_one('.infos > p:nth-child(1) > strong:nth-child(3)').text
+                temp = ({'url':urlF,'title':titF,'plot':plot,'year':int(year),'genre':genre,'titleoriginal':name_ori,'trailer':trailer})
+                # xbmc.log('[plugin.video.filmestorrentbrasil] L205 - ' + str(temp), xbmc.LOGINFO)
                 plot = dict(temp)
         except:
-                plot = 'Sem Sinopse'
+                plot = ({'url':urlF,'title':'','plot':'','year':0,'genre':['A','B'],'titleoriginal':'','trailer':''})
                 pass
+
         try:
-                epsodios=soup.css.select_one('.epsodios')
+                epsodios=soup.css.select('.btn-success')
                 totF = len(epsodios)
-                for e,t in zip(epsodios.select('p a'),epsodios.select('p strong')):
-                        titF = t.text.replace(':','')
-                        if titF == "" : titF = name
-                        urlF = e['data-u'][::3]
+                for e in epsodios:
+                        titF = e['title']
+                        titF = titF.removeprefix("BAIXAR ").replace('DOWNLOAD ','').replace(' TORRENT','').replace('MKV','').title()
+                        urlF = e['href']
                         addDirF(titF, urlF, 110, imgF, plot, False, totF)
         except:
-                epsodios=soup.css.select_one('.btn-down')
-                totF = len(epsodios)
-                for e in epsodios.select('span a'):
-                        titF = e.text.replace(':','')
-                        if titF == "" : titF = name
-                        urlF = e['data-u'][::3]
-                        addDirF(titF, urlF, 110, imgF, plot, False, totF)
                 pass
+        
+        try:
+                epsodios=soup.css.select('.btn-danger')
+                totF = len(epsodios)
+                for e in epsodios:
+                        titF = e['title']
+                        titF = titF.removeprefix("BAIXAR ").replace('DOWNLOAD ','').replace(' TORRENT','').replace('MKV','').title()
+                        urlF = e['href']
+                        addDirF(titF, urlF, 110, imgF, plot, False, totF)
+        except:
+                pass
+        # try:
+        #         epsodios=soup.css.select_one('.epsodios')
+        #         totF = len(epsodios)
+        #         for e,t in zip(epsodios.select('p a'),epsodios.select('p strong')):
+        #                 titF = t.text
+        #                 urlF = e['data-u'][::3]
+        #                 addDirF(titF, urlF, 110, imgF, plot, False, totF)
+
+        # except:
+        #         epsodios=soup.css.select_one('.btn-down')
+        #         totF = len(epsodios)
+        #         for e in epsodios.select('span a'):
+        #                 if e.text == '' :
+        #                         titF = 'Todos Episodios'
+        #                 else:
+        #                         titF = e.text
+        #                 urlF = e['data-u'][::3]
+        #                 addDirF(titF, urlF, 110, imgF, plot, False, totF)
+        #         pass
 
 def pesquisa():
         keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
@@ -220,28 +259,38 @@ def pesquisa():
         if (keyb.isConfirmed()):
                 texto    = keyb.getText()
                 pesquisa = urllib.parse.quote(texto)
-                url      = base + '?s=%s' % str(pesquisa)
+                url      = base + '/index.php?s=%s' % str(pesquisa)
 
                 hosts = []
                 temp = []
                 link = openURL(url)
                 soup = BeautifulSoup(link, "html.parser")
-                conteudo = soup('div',{'class':'home post-catalog'})
-                filmes = conteudo[0]('div',{'class':'item'})
 
-                totF = len(filmes)
+                for i,item in enumerate(soup.css.select(".capaname > a")):
+                        titF = ''
+                        titF = item['title']
+                        titF = titF.replace('Torrent Download Dublado','').replace('/ Dual Áudio','').replace('Legendado Torrent Download','')
+                        urlF = item['href']
+                        imgF = item.img['src']
+                        temp = [urlF, titF, imgF]
+                        hosts.append(temp)
 
-                for filme in filmes:
-                        titF = ""
-                        try:
-                            urlF = filme('a')[0]['href']
-                            titF = filme('a')[0]['title']
-                            imgF = filme('div',{'class':'post-image-sub'})[0].get('data-bk')
-                            urlF = base + urlF if urlF.startswith("/") else urlF
-                            temp = [urlF, titF, imgF]
-                            hosts.append(temp)
-                        except:
-                            pass
+                # conteudo = soup('div',{'class':'home post-catalog'})
+                # filmes = conteudo[0]('div',{'class':'item'})
+
+                # totF = len(filmes)
+
+                # for filme in filmes:
+                #         titF = ""
+                #         try:
+                #             urlF = filme('a')[0]['href']
+                #             titF = filme('a')[0]['title']
+                #             imgF = filme('div',{'class':'post-image-sub'})[0].get('data-bk')
+                #             urlF = base + urlF if urlF.startswith("/") else urlF
+                #             temp = [urlF, titF, imgF]
+                #             hosts.append(temp)
+                #         except:
+                #             pass
 
                 return hosts
 
@@ -250,7 +299,7 @@ def doPesquisaSeries():
         if a is None : return
         totF = len(a)
         plot = []
-        plot = ({'plot':'','year':0,'genre':['A','B'],'titleoriginal':''})
+        plot = ({'url':'','title':'','plot':'','year':0,'genre':['A','B'],'titleoriginal':'','trailer':''})
         for urlF, titF, imgF in a:
                 if "Temporada" in titF:
                         addDirF(titF, urlF, 27, imgF, plot, True, totF)
@@ -264,7 +313,7 @@ def doPesquisaFilmes():
         if a is None : return
         totF = len(a)
         plot = []
-        plot = ({'plot':'','year':0,'genre':['A','B'],'titleoriginal':''})
+        plot = ({'url':'','title':'','plot':'','year':0,'genre':['A','B'],'titleoriginal':'','trailer':''})
         for urlF, titF, imgF in a:
                 if "Temporada" in titF:
                         addDirF(titF, urlF, 27, imgF, plot, True, totF)
@@ -274,7 +323,7 @@ def doPesquisaFilmes():
         setViewFilmes()
 
 def player(name,url,iconimage):
-        xbmc.log('[plugin.video.filmestorrentbrasil] L277 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L298 - ' + str(url), xbmc.LOGINFO)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('FilmestorrentBrasil', 'Obtendo Fontes para ' + name + ' Por favor aguarde...')
@@ -286,50 +335,22 @@ def player(name,url,iconimage):
 
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
-        conteudo = soup("div",{"class":"container"})
-        buttons = conteudo[1]("div",{"class":"buttons-content"})
         links=[]
-        for i in buttons:
-                if '91A89222EFDC' in str(i):
-                    links.append(i)
-                elif 'data-u' in str(i):
-                    links.append(i)
+        try:
+                urlVideo = soup.select('.btn-success')[0]['href']
+                #titF = soup.css.select_one('.btn-success')['title']
+                titF = soup.select_one('strong.h4').text
+                titF = titF.replace('Torrent','').replace('Download','')
+        except:
+                urlVideo = soup.css.select_one('.btn-danger')['href']
+                #titF = soup.css.select_one('.btn-danger')['title']
+                titF = soup.select_one('strong.h4').text
+                titF = titF.replace('Torrent','').replace('Download','')
+                pass
 
-        n = 1
-
-        for link in links:
-            if 'campanha' in str(link) :
-                urlF = link.a['href']
-                print(urlF)
-                idS = urlF.split('id=')[-1]
-                urlVideo = base64.b64decode(idS)
-                titS = "Server_" + str(n)
-                n = n + 1
-                titsT.append(titS)
-                idsT.append(urlVideo)
-            elif '91A89222EFDC' in str(link):
-                #if titF: titF = 'Epis'
-                u = link.a['href']
-                fxID = u[::-1]
-                urlVideo = base64.b64decode(fxID)
-                urlVideo = urllib.parse.unquote(urlVideo)
-                titS = "Server_" + str(n)
-                n = n + 1
-                titsT.append(titS)
-                idsT.append(urlVideo)
-            if 'data-u' in str(link):
-                urlF = link.a['data-u']
-                urlVideo = urlF[::3]
-                xbmc.log('[plugin.video.filmestorrentbrasil] L323 - ' + str(urlVideo), xbmc.LOGINFO)
-                if '&dn=' in str(urlVideo) :
-                    titF = urlVideo.split('&dn=')[1].split('&tr=')[0]
-                    titF = urllib.parse.unquote(titF)
-                    titS = titF[0:50]
-                else:
-                    titS = link.text.replace('\n','') #"Server_" +str(n)
-                n = n + 1
-                titsT.append(titS)
-                idsT.append(urlVideo)
+        trailer = soup.select_one('.embed-responsive-item')['src']
+        titsT.append(titF)
+        idsT.append(urlVideo)
 
         if not titsT : return
 
@@ -340,7 +361,7 @@ def player(name,url,iconimage):
         i = int(index)
         urlVideo = idsT[i]
 
-        xbmc.log('[plugin.video.filmestorrentbrasil] L343 - ' + str(urlVideo), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L364 - ' + str(urlVideo), xbmc.LOGINFO)
 
         mensagemprogresso.update(50, 'Resolvendo fonte para ' + name + ' Por favor aguarde...')
 
@@ -361,7 +382,7 @@ def player(name,url,iconimage):
                 url2Play = []
                 pass
 
-        xbmc.log('[plugin.video.filmestorrentbrasil] L364 - ' + str(url2Play), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L385 - ' + str(url2Play), xbmc.LOGINFO)
 
         if not url2Play : return
 
@@ -428,7 +449,7 @@ def player(name,url,iconimage):
         return OK
 
 def player_series(name,url,iconimage):
-        xbmc.log('[plugin.video.filmestorrentbrasil] L431 - ' + str(url), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L452 - ' + str(url), xbmc.LOGINFO)
         OK = True
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('FilmestorrentBrasil', 'Obtendo Fontes para ' + name + ' Por favor aguarde...')
@@ -446,7 +467,7 @@ def player_series(name,url,iconimage):
                 url2Play = 'plugin://plugin.video.elementum/play?uri={0}'.format(urlVideo)
                 OK = False
 
-        xbmc.log('[plugin.video.filmestorrentbrasil] L449 - ' + str(url2Play), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L470 - ' + str(url2Play), xbmc.LOGINFO)
 
         if OK :
             try:
@@ -470,8 +491,7 @@ def player_series(name,url,iconimage):
         playlist.clear()
 
         if "m3u8" in url2Play:
-                #ip = addon.getSetting("inputstream")
-                listitem = xbmcgui.ListItem((name.split("|")[0]), path=url2Play)
+                listitem = xbmcgui.ListItem(label=(name.split("|")[0]), path=url2Play)
                 listitem.setArt({"thumb": iconimage, "icon": iconimage})
                 listitem.setArt({"Poster": iconimage})
                 listitem.setProperty('IsPlayable', 'true')
@@ -480,19 +500,26 @@ def player_series(name,url,iconimage):
                 listitem.setContentLookup(False)
                 playlist.add(url2Play,listitem)
         else:
-                listitem = xbmcgui.ListItem(name, path=url2Play)
+                listitem = xbmcgui.ListItem(label=name, path=url2Play)
                 if int(installed_version) > 18:
                         info_tag = listitem.getVideoInfoTag()
                         info_tag.setMediaType('video')
                         info_tag.setTitle(name) #.split("|")[0])
                         listitem.setArt({'icon': iconimage, 'thumb': iconimage, 'fanart': iconimage })
                         listitem.setContentLookup(False)
+                        listitem.setProperty('IsPlayable', 'true')
+                        listitem.setPath(url2Play)
                         playlist.add(url2Play,listitem)
                 else:
                         listitem.setProperty('fanart_image', fanart)
                         listitem.setInfo(type = "Video", infoLabels = {"title": name})
                         listitem.setArt({'icon': iconimage, 'thumb': iconimage })
                         playlist.add(url2Play,listitem)
+
+        # play_item = xbmcgui.ListItem(label=name,offscreen=False)
+        # play_item.setPath(url2Play)
+        # # Pass the item to the Kodi player.
+        # xbmcplugin.setResolvedUrl(_handle, True, listitem=play_item)
 
         xbmcPlayer = xbmc.Player()
 
@@ -545,10 +572,10 @@ def openURL(url):
         else:
             headers= {
                     "Upgrade-Insecure-Requests": "1",
-                    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0"
+                    "User-Agent": "Mozilla/5.0" # (X11; Ubuntu; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0"
                      }
-            link = requests.get(url=url, headers=headers).content
-            return link
+            link = requests.get(url=url, headers=headers).text    #content
+        return link
 
 def postURL(url):
         headers = {'Referer': base,
@@ -571,7 +598,7 @@ def addDir(name, url, mode, iconimage, total=1, pasta=True):
                 info_tag = liz.getVideoInfoTag()
                 info_tag.setMediaType('movie')
                 info_tag.setTitle(name) #.split("|")[0])
-                #xbmc.log('[plugin.video.filmestorrentbrasil] L574 - ' + str(name), xbmc.LOGINFO)
+                #xbmc.log('[plugin.video.filmestorrentbrasil] L595 - ' + str(name), xbmc.LOGINFO)
                 liz.setArt({
                         'icon': iconimage,
                         'thumb': iconimage,
@@ -601,18 +628,18 @@ def addDirF(name,url,mode,iconimage,plot=dict(),pasta=False,total=1) :
                         info_tag.setTitle(name.split("|")[0])
                 else:
                         info_tag.setTitle(name)
-                #xbmc.log('[plugin.video.filmestorrentbrasil] L604 - ' + str(url), xbmc.LOGINFO)
-                #xbmc.log('[plugin.video.filmestorrentbrasil] L605 - ' + str(plot), xbmc.LOGINFO)
                 info_tag.setPlot(plot['plot'])
                 info_tag.setYear(plot['year'])
                 info_tag.setGenres(plot['genre'])
                 info_tag.setOriginalTitle(plot['titleoriginal'])
+                info_tag.setTrailer(plot['trailer'])
                 liz.setArt({
                         'icon': iconimage,
                         'poster': iconimage,
                         'thumb': iconimage,
                         'fanart': iconimage
                         })
+                liz.setProperty('label2',plot['title'])
                 #liz.setProperty('IsPlayable', 'true')
         else:
                 liz.setProperty('fanart_image', fanart)
@@ -639,14 +666,14 @@ def getInfo(url):
 
 def playTrailer(name, url,iconimage):
         link = openURL(url)
-        ytID = re.findall(r'data-youtube-link=https:\/\/www.youtube.com\/embed\/(.*?)></div>',str(link))[0]
+        ytID = re.findall(r'<iframe class=\"embed-responsive-item\" loading=\"lazy\" title=\".*?\" src=\"https:\/\/www.youtube.com\/embed\/(.*?)\"><\/iframe>',str(link))[0]
         mensagemprogresso = xbmcgui.DialogProgress()
         mensagemprogresso.create('FilmestorrentBrasil', 'Obtendo Fontes para ' + name + ' Por favor aguarde...')
         mensagemprogresso.update(0)
 
         mensagemprogresso.update(100, 'Resolvendo fonte para ' + name+ ' Por favor aguarde...')
         mensagemprogresso.close()
-        xbmc.log('[plugin.video.filmestorrentbrasil] L649 - ' + str(name), xbmc.LOGINFO)
+        xbmc.log('[plugin.video.filmestorrentbrasil] L670 - ' + str(name), xbmc.LOGINFO)
 
         if not ytID :
             addon = xbmcaddon.Addon()
@@ -676,7 +703,7 @@ def setViewFilmes() :
         opcao = selfAddon.getSetting('filmesVisu')
         opcao = '2'
 
-        #xbmc.log('[plugin.video.filmestorrentbrasil] L679 - ' + str(opcao), xbmc.LOGINFO)
+        #xbmc.log('[plugin.video.filmestorrentbrasil] L700 - ' + str(opcao), xbmc.LOGINFO)
 
         if   opcao == '0': xbmc.executebuiltin("Container.SetViewMode(50)")
         elif opcao == '1': xbmc.executebuiltin("Container.SetViewMode(51)")
@@ -699,19 +726,27 @@ def limpa(texto):
 def sinopse(urlF):
         html = openURL(urlF)
         soup = BeautifulSoup(html, 'html.parser')
-        #conteudo = soup("div", {"id": "info"})
         temp = []
         try:
-                plot=soup.select('.sinopse > span:nth-child(2)')[0].text
-                year=soup.select('.post-description > p:nth-child(4) > span:nth-child(2)')[0].text
-                genre=soup.select('.post-description > p:nth-child(6) > span:nth-child(2)')[0].text
-                name_ori=soup.select('.post-description > p:nth-child(3) > span:nth-child(2)')[0].text
-                genre=genre.split(',')
-                temp = ({'plot':plot,'year':int(year),'genre':genre,'titleoriginal':name_ori})
+                titF = soup.select_one('p.cover > img')['title']
+                titF = titF.replace('Torrent','').replace('Download','')
+                plot = soup.select('.sinopse')[0].text
+                plot = plot.replace('\n','').replace('\t','')
+                year = soup.select('.infos > p:nth-child(1) > strong:nth-child(7)')[0].next_sibling.split()[1]
+                info = soup.select('.infos > p:nth-child(1)')[0]
+                genre = re.findall(r'<strong>Gêneros</strong>:(.*?)<br> <strong>', str(info))[0]
+                genre = genre.split(',')
+                t = soup.select_one('.embed-responsive-item')['src']
+                trailer = 'plugin://plugin.video.youtube/play/?video_id=%s' % t.split('/')[4]
+                name_ori = soup.select_one('.infos > p:nth-child(1) > strong:nth-child(3)').text
+                temp = ({'url':urlF,'title':titF,'plot':plot,'year':int(year),'genre':genre,'titleoriginal':name_ori,'trailer':trailer})
+                # xbmc.log('[plugin.video.filmestorrentbrasil] L742 - ' + str(temp), xbmc.LOGINFO)
                 plot = dict(temp)
         except:
-            plot = 'Sem Sinopse'
-            pass
+                plot = []
+                plot = ({'url':urlF,'title':'','plot':'','year':0,'genre':['A','B'],'titleoriginal':'','trailer':''})
+                pass
+
         return plot
 
 ############################################################################################################
