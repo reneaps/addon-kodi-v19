@@ -7,6 +7,7 @@
 # Atualizado (3.2.0) - 25/08/2026
 # Atualizado (3.2.1) - 25/08/2026
 # Atualizado (3.2.2) - 31/08/2026
+# Atualizado (3.2.3) - 03/09/2026
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -125,7 +126,7 @@ def getSeries(name,url,iconimage):
 
         try :
                 proxima = re.findall(r'<div class="prev-active"><a href="(.*?)">.*?</a></div>', str(soup))
-                if len(proxima) > 0:
+                if len(proxima) > 1:
                         proxima = proxima[1]
                         addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
                         xbmc.log('[plugin.video.filmestorrentbrasil] L131 - ' + str(proxima), xbmc.LOGINFO)
@@ -179,7 +180,8 @@ def getEpisodios(name, url, iconimage):
                 year=soup.select('.post-description > p:nth-child(4) > span:nth-child(2)')[0].text
                 genre=soup.select('.post-description > p:nth-child(6) > span:nth-child(2)')[0].text
                 name_ori=soup.select('.post-description > p:nth-child(3) > span:nth-child(2)')[0].text
-                genre=genre.split(',')
+                if ',' in genre : genre=genre.split(',')
+                if '-' in year : year = year.split('-')[0]
                 temp = ({'plot':plot,'year':int(year),'genre':genre,'titleoriginal':name_ori})
                 plot = dict(temp)
         except:
@@ -190,11 +192,11 @@ def getEpisodios(name, url, iconimage):
                 if epsodios : totF = len(epsodios)
                 for e,t in zip(epsodios.select('p a'),epsodios.select('p strong')):
                         if len(e['href']) > 0 :
-                                titF = t.text if t.text else name+"Completa"
+                                titF = name + " > " + t.text if t.text else name+"Completa"
                                 ids = e['href'].split("=")[-1]
                                 urlF = base64.b64decode(ids + '=' * (-len(ids) % 4))
-                                addDir(titF, urlF, 110, iconimage, False, totF)
-                        #addDirF(titF, urlF, 110, imgF, plot, False, totF)
+                                #addDir(titF, urlF, 110, iconimage, False, totF)
+                                addDirF(titF, urlF, 110, imgF, plot, False, totF)
         except:
                 msg = "Sem tag epsodios"
                 xbmc.log('[plugin.video.filmestorren tbrasil] L200 - ' + str(msg), xbmc.LOGINFO)
@@ -208,9 +210,10 @@ def getEpisodios(name, url, iconimage):
                                 titF = t.text if e.text else name+" Completa"
                                 ids = e['href'].split("=")[-1]
                                 urlF = base64.b64decode(ids + '=' * (-len(ids) % 4))
-                                addDir(titF, urlF, 110, iconimage, False, totF)
-                        #urlF = e['data-u'][::3]
-                        #addDirF(titF, urlF, 110, imgF, plot, False, totF)
+                                #addDir(titF, urlF, 110, iconimage, False, totF)
+                                #urlF = e['data-u'][::3]
+                                addDirF(titF, urlF, 110, imgF, plot, False, totF)
+                xbmc.log('[plugin.video.filmestorren tbrasil] L214 - ' + str(e), xbmc.LOGINFO)
         except:
                 pass
 
@@ -371,7 +374,7 @@ def player(name,url,iconimage):
         if not url2Play : return
 
         if sub is None:
-                egendas = '-'
+                legendas = '-'
         else:
                 legendas = sub
 
@@ -476,28 +479,30 @@ def player_series(name,url,iconimage):
 
         if "m3u8" in url2Play:
                 #ip = addon.getSetting("inputstream")
-                listitem = xbmcgui.ListItem((name.split("|")[0]), path=url2Play)
+                listitem = xbmcgui.ListItem(name, path=url2Play)
                 listitem.setArt({"thumb": iconimage, "icon": iconimage})
                 listitem.setArt({"Poster": iconimage})
                 listitem.setProperty('IsPlayable', 'true')
                 listitem.setMimeType('application/x-mpegURL')
                 listitem.setProperty('inputstream','inputstream.hls')
+                #listitem.setProperty('inputstream.adaptive.manifest_type', 'hls')
+                #listitem.setMimeType('application/dash+xml')
                 listitem.setContentLookup(False)
                 playlist.add(url2Play,listitem)
         else:
                 listitem = xbmcgui.ListItem(name, path=url2Play)
                 if int(installed_version) > 18:
+                        listitem.setPath(url2Play)
                         info_tag = listitem.getVideoInfoTag()
                         info_tag.setMediaType('video')
-                        info_tag.setTitle(name) #.split("|")[0])
+                        info_tag.setTitle(name.split("|")[0])
                         listitem.setArt({'icon': iconimage, 'thumb': iconimage, 'fanart': iconimage })
-                        listitem.setContentLookup(False)
-                        playlist.add(url2Play,listitem)
+                        playlist.add(url2Play, listitem)
                 else:
                         listitem.setProperty('fanart_image', fanart)
                         listitem.setInfo(type = "Video", infoLabels = {"title": name})
                         listitem.setArt({'icon': iconimage, 'thumb': iconimage })
-                        playlist.add(url2Play,listitem)
+                        playlist.add(url2Play, listitem)
 
         xbmcPlayer = xbmc.Player()
 
@@ -704,20 +709,22 @@ def limpa(texto):
 def sinopse(urlF):
         html = openURL(urlF)
         soup = BeautifulSoup(html, 'html.parser')
-        #conteudo = soup("div", {"id": "info"})
         temp = []
+        plot = []
+        genre = []
         try:
                 plot=soup.select('.sinopse > span:nth-child(2)')[0].text
                 year=soup.select('.post-description > p:nth-child(4) > span:nth-child(2)')[0].text
                 genre=soup.select('.post-description > p:nth-child(6) > span:nth-child(2)')[0].text
                 name_ori=soup.select('.post-description > p:nth-child(3) > span:nth-child(2)')[0].text
-                genre=genre.split(',')
+                if ',' in genre : genre = genre.split(',')
+                if '-' in year : year = year.split('-')[0]
                 temp = ({'plot':plot,'year':int(year),'genre':genre,'titleoriginal':name_ori})
                 plot = dict(temp)
         except:
-                plot = []
-                plot = ({'plot':'','year':0,'genre':['A','B'],'titleoriginal':''})
+                plot = ({'plot':'','year':0,'genre':["A","B","C"],'titleoriginal':''})
                 pass
+
         return plot
 
 ############################################################################################################
