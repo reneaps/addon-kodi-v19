@@ -8,6 +8,7 @@
 # Atualizado (3.2.1) - 25/08/2026
 # Atualizado (3.2.2) - 31/08/2026
 # Atualizado (3.2.3) - 03/09/2026
+# Atualizado (3.2.4) - 12/09/2026
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -68,7 +69,6 @@ def getCategorias(url):
 
 def getFilmes(name,url,iconimage):
         xbmc.log('[plugin.video.filmestorrentbrasil] L69 - ' + str(url), xbmc.LOGINFO)
-        xbmcplugin.setContent(handle=int(sys.argv[1]), content='movies')
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
         conteudo = soup('div',{'class':'home post-catalog'})
@@ -92,6 +92,8 @@ def getFilmes(name,url,iconimage):
                 except:
                         pass
 
+        xbmcplugin.setContent(handle=int(sys.argv[1]), content='movies')
+
         try :
                 proxima = re.findall(r'<div class="prev-active"><a href="(.*?)">.*?</a></div>', str(soup))
                 if len(proxima) > 1:
@@ -104,11 +106,8 @@ def getFilmes(name,url,iconimage):
         except :
                 pass
 
-        setViewFilmes()
-
 def getSeries(name,url,iconimage):
         xbmc.log('[plugin.video.filmestorrentbrasil] L109 - ' + str(url), xbmc.LOGINFO)
-        xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
         link = openURL(url)
         soup = BeautifulSoup(link, "html.parser")
         conteudo = soup('div', {'class':'home post-catalog'})
@@ -124,6 +123,8 @@ def getSeries(name,url,iconimage):
                 plot = sinopse(urlF)
                 addDirF(titF, urlF, 27, imgF, plot, True, totF)
 
+        xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
+
         try :
                 proxima = re.findall(r'<div class="prev-active"><a href="(.*?)">.*?</a></div>', str(soup))
                 if len(proxima) > 1:
@@ -136,8 +137,6 @@ def getSeries(name,url,iconimage):
                         addDir('Próxima Página >>', proxima, 25, artfolder + 'proxima.png')
         except :
                 pass
-
-        #setViewFilmes()
 
 def getTemporadas(name,url,iconimage):
         xbmc.log('[plugin.video.filmestorrentbrasil] L142 - ' + str(url), xbmc.LOGINFO)
@@ -161,7 +160,6 @@ def getTemporadas(name,url,iconimage):
 
 def getEpisodios(name, url, iconimage):
         xbmc.log('[plugin.video.filmestorren tbrasil] L162 - ' + str(url), xbmc.LOGINFO)
-        xbmcplugin.setContent(_handle, content='episodes')
         link = openURL(url)
         soup = BeautifulSoup(link, 'html.parser')
         #conteudo = soup("div", {"class":"container"})
@@ -180,7 +178,10 @@ def getEpisodios(name, url, iconimage):
                 year=soup.select('.post-description > p:nth-child(4) > span:nth-child(2)')[0].text
                 genre=soup.select('.post-description > p:nth-child(6) > span:nth-child(2)')[0].text
                 name_ori=soup.select('.post-description > p:nth-child(3) > span:nth-child(2)')[0].text
-                if ',' in genre : genre=genre.split(',')
+                if ',' in genre :
+                        genre = genre.split(',')
+                else:
+                        genre = [genre]
                 if '-' in year : year = year.split('-')[0]
                 temp = ({'plot':plot,'year':int(year),'genre':genre,'titleoriginal':name_ori})
                 plot = dict(temp)
@@ -216,6 +217,8 @@ def getEpisodios(name, url, iconimage):
                 xbmc.log('[plugin.video.filmestorren tbrasil] L214 - ' + str(e), xbmc.LOGINFO)
         except:
                 pass
+
+        xbmcplugin.setContent(_handle, content='episodes')
 
 def pesquisa():
         keyb = xbmc.Keyboard('', 'Pesquisar Filmes')
@@ -717,7 +720,10 @@ def sinopse(urlF):
                 year=soup.select('.post-description > p:nth-child(4) > span:nth-child(2)')[0].text
                 genre=soup.select('.post-description > p:nth-child(6) > span:nth-child(2)')[0].text
                 name_ori=soup.select('.post-description > p:nth-child(3) > span:nth-child(2)')[0].text
-                if ',' in genre : genre = genre.split(',')
+                if ',' in genre :
+                        genre = genre.split(',')
+                else:
+                        genre = [genre]
                 if '-' in year : year = year.split('-')[0]
                 temp = ({'plot':plot,'year':int(year),'genre':genre,'titleoriginal':name_ori})
                 plot = dict(temp)
