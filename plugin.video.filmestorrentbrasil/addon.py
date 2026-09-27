@@ -10,6 +10,7 @@
 # Atualizado (3.2.3) - 03/09/2026
 # Atualizado (3.2.4) - 12/09/2026
 # Atualizado (3.2.5) - 27/09/2026
+# Atualizado (3.2.6) - 27/09/2026
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -195,8 +196,11 @@ def getEpisodios(name, url, iconimage):
                 for e,t in zip(epsodios.select('p a'),epsodios.select('p strong')):
                         if len(e['href']) > 0 :
                                 titF = name + " > " + t.text if t.text else name+"Completa"
-                                ids = e['href'].split("=")[-1]
-                                urlF = base64.b64decode(ids + '=' * (-len(ids) % 4))
+                                if 'magnet' in str(e['href']) :
+                                        urlF = e['href']
+                                else :
+                                        ids = e['href'].split("=")[-1]
+                                        urlF = base64.b64decode(ids + '=' * (-len(ids) % 4))
                                 #addDir(titF, urlF, 110, iconimage, False, totF)
                                 addDirF(titF, urlF, 110, imgF, plot, False, totF)
         except:
@@ -210,8 +214,11 @@ def getEpisodios(name, url, iconimage):
                 for e in epsodios.select('span a'):
                         if len(e['href']) > 0 :
                                 titF = t.text if e.text else name+" Completa"
-                                ids = e['href'].split("=")[-1]
-                                urlF = base64.b64decode(ids + '=' * (-len(ids) % 4))
+                                if 'magnet' in str(e['href']) :
+                                        urlF = e['href']
+                                else :
+                                        ids = e['href'].split("=")[-1]
+                                        urlF = base64.b64decode(ids + '=' * (-len(ids) % 4))
                                 #addDir(titF, urlF, 110, iconimage, False, totF)
                                 #urlF = e['data-u'][::3]
                                 addDirF(titF, urlF, 110, imgF, plot, False, totF)
