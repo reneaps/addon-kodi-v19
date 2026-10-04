@@ -12,6 +12,7 @@
 # Atualizado (3.2.5) - 27/09/2026
 # Atualizado (3.2.6) - 27/09/2026
 # Atualizado (3.2.7) - 03/10/2026
+# Atualizado (3.2.8) - 03/10/2026
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -199,11 +200,13 @@ def getEpisodios(name, url, iconimage):
                                 titF = name + " > " + t.text if t.text else name+"Completa"
                                 if 'magnet' in str(e['href']) :
                                         urlF = e['href']
+                                elif 'data-u' in str(e):
+                                        urlF =  e['data-u'][::3]
                                 else :
                                         ids = e['href'].split("=")[-1]
                                         urlF = base64.b64decode(ids + '=' * (-len(ids) % 4))
-                                #addDir(titF, urlF, 110, iconimage, False, totF)
                                 addDirF(titF, urlF, 110, imgF, plot, False, totF)
+                xbmc.log('[plugin.video.filmestorren tbrasil] L208 - ' + str(urlF), xbmc.LOGINFO)
         except:
                 msg = "Sem tag epsodios"
                 xbmc.log('[plugin.video.filmestorren tbrasil] L200 - ' + str(msg), xbmc.LOGINFO)
@@ -217,11 +220,11 @@ def getEpisodios(name, url, iconimage):
                                 titF = t.text if e.text else name+" Completa"
                                 if 'magnet' in str(e['href']) :
                                         urlF = e['href']
+                                elif 'data-u' in str(e):
+                                        urlF =  e['data-u'][::3]
                                 else :
                                         ids = e['href'].split("=")[-1]
                                         urlF = base64.b64decode(ids + '=' * (-len(ids) % 4))
-                                #addDir(titF, urlF, 110, iconimage, False, totF)
-                                #urlF = e['data-u'][::3]
                                 addDirF(titF, urlF, 110, imgF, plot, False, totF)
                 xbmc.log('[plugin.video.filmestorren tbrasil] L214 - ' + str(e), xbmc.LOGINFO)
         except:
@@ -335,11 +338,11 @@ def player(name,url,iconimage):
                         titsT.append(titS)
                         idsT.append(urlVideo)
                 if 'data-u' in str(link):
-                        urlF = link.a['data-u']
+                        urlF = link.a['data-u'][::3]
                         if not urlF :
                                 ids = link.a['href'].split("=")[-1]
                                 urlF = base64.b64decode(ids + '=' * (-len(ids) % 4))
-                        urlVideo = urlF.decode("utf-8")
+                        urlVideo = urlF #.decode("utf-8")
                         xbmc.log('[plugin.video.filmestorrentbrasil] L328 - ' + str(urlVideo), xbmc.LOGINFO)
                         if '&dn=' in str(urlVideo) :
                                 titF = urlVideo.split('&dn=')[1].split('&tr=')[0]
