@@ -11,6 +11,7 @@
 # Atualizado (3.2.4) - 12/09/2026
 # Atualizado (3.2.5) - 27/09/2026
 # Atualizado (3.2.6) - 27/09/2026
+# Atualizado (3.2.7) - 03/10/2026
 #####################################################################
 
 import urllib, re, xbmcplugin, xbmcgui, xbmc, xbmcaddon, os, sys, time, base64
@@ -35,7 +36,7 @@ addonfolder = selfAddon.getAddonInfo('path')
 version     = selfAddon.getAddonInfo('version')
 artfolder   = addonfolder + '/resources/media/'
 fanart      = addonfolder + '/fanart.png'
-base        = 'https://starckfilmes-v24.com'
+base        = 'https://starckfilmes-v25.site'
 
 ############################################################################################################
 
